@@ -1,0 +1,35 @@
+[
+  {
+    "id": "e70c1d5d-d46d-405a-bbc8-53a6a2e87ab9",
+    "username": "Shibalik",
+    "password": "$2b$10$oig6Ggtp9Oiw/qCBSf7D.ea0xq5tCDM0ZmH2KV3PY6OPRU3F6hNfC",
+    "role": "user",
+    "gender": "neutral",
+    "avatarSeed": "Shibalik-neutral",
+    "createdAt": 1771569590061,
+    "lastActive": 1771569590061,
+    "firstLoginCompleted": true,
+    "spotifyTokens": {
+      "access_token": "BQBxV5k244lH2kWudUM34ouqaprEC-BKwMajPAOCxEMvVbG52bO3b8CAGIkednz7LoqiRSfezsQkXbwQ-2t49R0dFnWkYmXHEX8fTdpQonSYqcxy1Azc8idd8dr7V0ao1CQoLcTRHYnUYBj1XaOM18yv2SXNusZWyIv2kdPUIU0WRdW9evRWe6jo2aOY-ShcltEbwAfGXixaE4G3dX36dKvY770KQAn5rb6HuTr7P1O5fxZd1hlqHWGiuRGBWiM",
+      "refresh_token": "AQAZ4d5zEfb00PF96GY8w95SQOxKekxADYGeYRkRB-SFjC1CC3avXquiEgqa92OgDY99XSlQM2_y9nPeZDxB2C7ZG1oOQojrrV9M-l6niBojnqjjoK8X0xzT3DfpZ9HdQLk",
+      "expires_at": 1772343934711
+    }
+  },
+  {
+    "id": "DEV-0001",
+    "username": "developer",
+    "password": "$2b$10$r9s/gTFPMl8Upa41hYY0..6.KGuu17YBjzpBdTgoJQMXMUzVo3bbS",
+    "role": "developer",
+    "gender": "neutral",
+    "avatarSeed": "dev-master",
+    "createdAt": 1771579532364,
+    "lastActive": 1771579532364,
+    "lastShape": "infinity",
+    "firstLoginCompleted": true,
+    "spotifyTokens": {
+      "access_token": "BQDjN1D314-6qR-rXkAke1n8QgXSLUJvrkOeTDtwC158pcLDvLOrzq6EH4H03TDWCg4wYmgN67Jj3-oYeF1YClNxT77LlO2j9z5WZazMyrF9ubcqAgRO7Kq8eLMXYKYSPt2IF7poLIrj2zosxy6GKC80QaR0I9lRWyWeDQ6m2npu5YYwD5dJU3VhyZquG97koQhZxzjRP33fxDrJaE7c-0Ok7RwISPfM1psZNInwZAZ5ZZGVv20bvtSWFstzzrg",
+      "refresh_token": "AQBQbV9iUcLRrRlacYZ9KN881k89u9glN7D1Y39CfU5eA2al2Z5aN8RCY0WKkpUdgycmDso2PMxZMzqeyvxYEFsjpskx7bDdNQBPjl4yfVQpuJp88LgHYdkMmmwIRxw3OGI",
+      "expires_at": 1772721980255
+    }
+  }
+]

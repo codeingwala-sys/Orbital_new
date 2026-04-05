@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Intro Test — Orbital</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; overflow: hidden; }
+
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #0d0020 0%, #000 70%);
+      display: grid;
+      place-items: center;
+      z-index: 20;
+    }
+
+    #loader-fallback {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(155,77,255,0.15);
+      border-top: 2px solid #9b4dff;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #after {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: #000;
+      color: rgba(200,180,255,0.8);
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      text-align: center;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    #after .tick { color: #9b4dff; font-size: 2rem; }
+    #after button {
+      margin-top: 20px;
+      padding: 10px 28px;
+      background: rgba(155,77,255,0.2);
+      border: 1px solid rgba(155,77,255,0.5);
+      color: #c9b6ff;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    #after button:hover { background: rgba(155,77,255,0.4); }
+  </style>
+</head>
+<body>
+
+<!-- Intro runs inside this -->
+<div id="loader">
+  <div id="loader-fallback"></div>
+</div>
+
+<!-- Shown after intro completes -->
+<div id="after">
+  <div class="tick">✓</div>
+  <div>Intro completed successfully</div>
+  <button onclick="location.reload()">Play Again</button>
+</div>
+
+<!-- Three.js must load before orbital-intro.js -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="orbital-intro.js"></script>
+
+<script>
+  // Simulate server ready after 2s so shatter triggers naturally
+  window.systemReady = false;
+  setTimeout(() => { window.systemReady = true; }, 2000);
+
+  // Poll for intro done then show success screen
+  const check = setInterval(() => {
+    if (window._introAnimDone) {
+      clearInterval(check);
+      document.getElementById("loader").remove();
+      const after = document.getElementById("after");
+      after.style.display = "flex";
+    }
+  }, 100);
+</script>
+
+</body>
+</html>

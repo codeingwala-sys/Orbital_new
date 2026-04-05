@@ -1,0 +1,5624 @@
+<!-- updated on 03-03-2026 2:57pm -->
+<!-- Orbital Ai is stabled and chat panel added-->
+ <!-- login details can be viewed -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gesture Controlled Particle Universe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+
+    body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+    :root {
+  --accent: #9b4dff;
+  --accent-soft: rgba(155, 77, 255, 0.35);
+  --glass-dark: rgba(12, 8, 22, 0.55);
+  --glass-light: rgba(255, 255, 255, 0.12);
+  --text-main: #e6e6e6;
+  --text-muted: #a8a8b3;
+  
+}
+
+    body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at center, rgba(155,77,255,0.06), transparent 70%);
+}
+
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #000;
+      width: 100%;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    canvas { display: block; }
+    
+    #video {
+    display: none;
+    transform: scaleX(-1);
+    }
+
+
+    #skeleton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+
+  width: 260px;
+  height: 260px;
+
+  border-radius: 24px;
+  overflow: hidden;
+  z-index: 90;
+
+  /* TRUE GLASS LAYERING */
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,0.08),
+      rgba(255,255,255,0.02)
+    );
+
+  backdrop-filter: blur(35px) saturate(180%);
+  -webkit-backdrop-filter: blur(35px) saturate(180%);
+
+  border: 1px solid rgba(255,255,255,0.15);
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.6),
+    inset 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+#skeleton::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.004),
+    transparent 40%
+  );
+
+  pointer-events: none;
+}
+
+#skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.04),
+      rgba(255,255,255,0.04) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+
+  pointer-events: none;
+}
+
+  /* ===== ORBITAL CINEMATIC INTRO ===== */
+
+#intro {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  z-index: 10;
+}
+
+#intro video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#intro video {
+  min-width: 100%;
+  min-height: 100%;
+  object-position: center center;
+}
+
+
+#intro .intro-btn {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.intro-btn:hover {
+  background: rgba(155,77,255,0.12);
+  box-shadow: 0 0 36px rgba(155,77,255,0.55);
+  transform: translateY(-1px);
+}
+
+
+    .intro-btn {
+  padding: 14px 44px;
+  font-size: 0.95rem;
+  letter-spacing: 1.5px;
+  color: #fff;
+  background:
+    linear-gradient(135deg, #b98cff, #6a0dad);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow:
+    0 0 24px var(--accent-soft),
+    inset 0 0 0 1px rgba(255,255,255,0.2);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.intro-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 34px rgba(155,77,255,0.65);
+}
+
+.intro-box {
+  position: relative;
+}
+
+
+  #handStatus {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 28px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  display: none;
+
+  background:
+    linear-gradient(135deg,
+      rgba(155,77,255,0.22),
+      rgba(90,40,160,0.18)),
+    var(--glass-dark);
+
+  color: #e8e2ff;
+
+  box-shadow:
+    0 0 32px rgba(155,77,255,0.35),
+    inset 0 0 0 1px rgba(255,255,255,0.18);
+
+  backdrop-filter: blur(14px);
+  z-index: 9;
+
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+
+#handStatus::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.12),
+    rgba(255,255,255,0)
+  );
+  pointer-events: none;
+}
+
+
+#handStatus.tracking {
+  color: #caffb3;
+  box-shadow:
+    0 0 26px rgba(120,255,160,0.55),
+    inset 0 0 0 1px rgba(120,255,160,0.35);
+}
+
+#handStatus.tracking {
+  box-shadow:
+    0 0 36px rgba(155,77,255,0.6),
+    inset 0 0 0 1px rgba(200,170,255,0.45);
+}
+
+#handStatus.twohand {
+  box-shadow:
+    0 0 32px rgba(255,200,120,0.55),
+    inset 0 0 0 1px rgba(255,200,120,0.45);
+}
+
+
+#handStatus.lost {
+  color: #ffb3b3;
+  box-shadow:
+    0 0 26px rgba(255,100,100,0.55),
+    inset 0 0 0 1px rgba(255,100,100,0.35);
+}
+
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+  canvas {
+  position: relative;
+  z-index: 0;
+  filter: contrast(1.05) saturate(1.05);
+}
+
+#handStatus.twohand {
+  color: #f3d7a6; /* softer gold */
+  box-shadow:
+    0 0 14px rgba(255, 200, 120, 0.35),
+    inset 0 0 0 1px rgba(255, 200, 120, 0.35);
+}
+
+#skeleton.twohand {
+  box-shadow:
+    0 0 26px rgba(255, 200, 120, 0.35),
+    inset 0 0 0 1px rgba(255, 200, 120, 0.35);
+}
+
+#skeleton.twohand {
+  animation: pulseSoft 2.4s ease-in-out infinite;
+}
+
+@keyframes pulseSoft {
+  0%, 100% { box-shadow: 0 0 22px rgba(255,200,120,0.28); }
+  50%      { box-shadow: 0 0 28px rgba(255,200,120,0.38); }
+}
+
+#handStatus {
+  cursor: pointer;
+}
+
+#handStatus:hover {
+  box-shadow:
+    0 0 34px rgba(155,77,255,0.55),
+    inset 0 0 0 1px rgba(255,255,255,0.25);
+  transform: translateX(-50%) scale(1.05);
+}
+
+
+    /* ---------- GLOBAL ATMOSPHERE ---------- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at center, rgba(155,77,255,0.08), transparent 70%);
+  z-index: 1;
+}
+
+/* ===== CINEMATIC EXIT TRANSITION ===== */
+
+#intro.exit {
+  pointer-events: none;
+  animation: introExit 1.2s ease forwards;
+}
+
+@keyframes introExit {
+  0% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes coreExit {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+/* ===== PREMIUM CAMERA ASSIST FRAME (MATCHES REFERENCE) ===== */
+#edgeLight {
+  position: fixed;
+  inset: 18px;
+  pointer-events: none;
+  z-index: 7;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+
+  border-radius: 56px;
+  border: 36px solid rgba(255,255,255,0.98);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.85),
+    inset 0 0 28px rgba(0, 0, 0, 0.25);
+
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+#loader {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #0d0020 0%, #000 70%);
+  display: grid;
+  place-items: center;
+  z-index: 20;
+}
+
+#loader video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== WELCOME OVERLAY ===== */
+#welcomeLayer {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 0; /* behind UI, above background */
+}
+
+
+#welcomeText {
+  text-align: center;
+  opacity: 0;
+  transform: scale(1.6);
+  filter: blur(6px);
+  transition:
+    opacity 1.4s ease,
+    transform 1.4s ease,
+    filter 1.4s ease;
+}
+
+
+#welcomeText.show {
+  opacity: 0.85;
+  transform: scale(1.0);
+  filter: blur(0px);
+}
+
+
+#welcomeText.hide {
+  opacity: 0;
+  transform: scale(0.9);
+  filter: blur(10px);
+}
+
+
+.welcome-line {
+  font-size: 1.1rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 10px;
+}
+
+.welcome-name {
+  font-size: clamp(7rem, 16vw, 13rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  opacity: 0.65;
+
+  background: linear-gradient(
+    180deg,
+    rgba(230,220,255,0.95),
+    rgba(150,120,255,0.45)
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  text-shadow:
+    0 0 80px rgba(155,77,255,0.45);
+}
+
+.cinematic-profiles::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(155,77,255,0.12),
+      transparent 55%
+    );
+}
+
+
+/* ================= DEV PANEL ================= */
+#devPanel {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: min(260px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #e6e6e6;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  z-index: 200;
+  display: none;
+  pointer-events: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+  box-sizing: border-box;
+}
+
+#devPanel.hidden {
+  pointer-events: none;
+}
+
+.dev-title {
+  font-weight: bold;
+  color: #9b4dff;
+  margin-bottom: 6px;
+}
+
+.dev-section {
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.dev-section b {
+  color: #c9b6ff;
+}
+
+
+
+#devGraph {
+  margin-top: 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+}
+
+/* ===== CINEMATIC PROFILE GATE ===== */
+
+.cinematic-profiles {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,0.06), transparent 60%),
+    rgba(0,0,0,0.92);
+  backdrop-filter: blur(14px);
+  z-index: 15;
+}
+
+.profile-title {
+  position: absolute;
+  top: 12%;
+  font-size: 0.75rem;
+  letter-spacing: 0.6em;
+  color: rgba(255,255,255,0.55);
+}
+
+/* ===== RAIL ===== */
+
+.profile-rail {
+  display: flex;
+  gap: 48px;
+  align-items: center;
+}
+
+/* ===== PROFILE ITEM ===== */
+
+.profile-item {
+  width: 180px;
+  text-align: center;
+  cursor: pointer;
+  transform: scale(0.9);
+  opacity: 0.55;
+  transition: all 0.45s ease;
+}
+
+.profile-item:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* focused look */
+.profile-item.selected {
+  transform: scale(1.18);
+  opacity: 1;
+}
+
+.profile-rail:hover .profile-item {
+  opacity: 0.35;
+  transform: scale(0.85);
+}
+
+.profile-rail:hover .profile-item:hover {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.cinematic-profiles {
+  transition: opacity 0.9s ease;
+}
+
+/* ===== CINEMATIC TRANSITION VEIL ===== */
+#transitionVeil {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(0,0,0,0.0),
+    rgba(0,0,0,0.85)
+  );
+  opacity: 0;
+  pointer-events: none;
+  z-index: 14;
+  transition: opacity 0.9s ease;
+}
+
+#transitionVeil.show {
+  opacity: 1;
+}
+
+/* ===== AVATAR ===== */
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #111;
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.85),
+    inset 0 0 0 1px rgba(255,255,255,0.15);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===== NAME ===== */
+
+.profile-name {
+  margin-top: 18px;
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  color: rgba(255,255,255,0.8);
+}
+
+
+/* ===== PROFILE CREATION : REDESIGN ===== */
+
+/* ================= AUTH MODAL ================= */
+
+.profile-modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 60;
+
+  background:
+    radial-gradient(circle at center, rgba(155,77,255,0.15), transparent 60%),
+    rgba(0,0,0,0.92);
+
+  backdrop-filter: blur(18px);
+}
+
+.profile-modal.hidden {
+  display: none;
+}
+
+.profile-modal-card {
+  width: 420px;
+  padding: 40px;
+  border-radius: 28px;
+  position: relative;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
+    rgba(14,12,20,0.96);
+
+  box-shadow:
+    0 50px 120px rgba(0,0,0,0.85),
+    inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+/* HEADER */
+.auth-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.auth-title {
+  font-size: 1.1rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #e8e2ff;
+  margin-bottom: 18px;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.auth-tab {
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.auth-tab.active {
+  background: linear-gradient(135deg, #9b4dff, #ffb86b);
+  color: #140b24;
+  border: none;
+}
+
+/* BODY */
+.auth-body label {
+  display: block;
+  margin-bottom: 18px;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+.auth-body input,
+.auth-body select {
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: none;
+  outline: none;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.auth-body input:focus,
+.auth-body select:focus {
+  box-shadow:
+    0 0 0 2px rgba(155,77,255,0.5),
+    0 0 20px rgba(155,77,255,0.35);
+}
+
+/* SUBMIT */
+.auth-submit {
+  width: 100%;
+  margin-top: 26px;
+  padding: 16px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+
+  --vibe-a: #9b4dff;
+  --vibe-b: #ffb86b;
+
+  background:
+    linear-gradient(120deg, var(--vibe-a), var(--vibe-b), var(--vibe-a));
+
+  background-size: 300% 300%;
+  animation: vibeWave 6s ease infinite;
+
+  color: #140b24;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+/*Pill Group Design*/
+.pill-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.pill {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+}
+
+.pill.active {
+  background: linear-gradient(135deg, #9b4dff, #ffb86b);
+  color: #1a0f2e;
+  border: none;
+}
+
+/* ================= EDIT MODE CANVAS ================= */
+
+#shapeEditor {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+
+#registerExtras {
+  overflow: hidden;
+  transition: all 0.35s ease;
+}
+
+#registerExtras.hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+  max-height: 0;
+  pointer-events: none;
+}
+
+#registerExtras.visible {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 500px;
+}
+
+
+/* ================= LOGIN TRANSITION ================= */
+
+.login-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at center,
+    rgba(155,77,255,0.25),
+    rgba(0,0,0,1)
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.login-transition.active {
+  opacity: 1;
+  pointer-events: none;
+}
+
+.transition-core {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    #9b4dff,
+    #ffb86b
+  );
+  box-shadow:
+    0 0 60px rgba(155,77,255,0.8),
+    0 0 120px rgba(255,184,107,0.6);
+  animation: corePulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes corePulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.4);
+  }
+}
+
+
+/* Vibe selector */
+.devMoodBtn {
+  padding: 5px 10px;
+  font-size: 11px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: #1a0f2e;
+  color: #ddd;
+  cursor: pointer;
+}
+
+.devMoodBtn:hover {
+  background: #9b4dff;
+  color: #140b24;
+}
+
+
+/* =================================================
+   UNIFIED SIDE PANEL SYSTEM
+   ================================================= */
+
+.cp-orb {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+
+  border: none;
+  cursor: pointer;
+  z-index: 200;
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+
+/* Hidden by default — only shows when AI is active */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.3s ease;
+}
+
+/* Outer ring always dimly visible after experience starts */
+.cp-orb.orb-ready {
+  opacity: 0.18;
+  pointer-events: auto;
+}
+
+/* Mouse moves → full brightness */
+.cp-orb.orb-ready.orb-mouse-visible {
+  opacity: 1;
+}
+
+/* AI active → full brightness */
+.cp-orb.orb-ready.orb-active {
+  opacity: 1;
+}
+
+/* Siri ribbons canvas hidden when AI is idle */
+.cp-orb.orb-ready:not(.orb-active) .orb-face canvas {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Siri ribbons canvas visible when AI is active */
+.cp-orb.orb-ready.orb-active .orb-face canvas {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.cp-orb:hover {
+  transform: scale(1.08);
+}
+
+/* 3D sphere face */
+.cp-orb .orb-face {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+
+  /* Deep space layered background — gives 3D sphere depth */
+  background:
+    radial-gradient(circle at 35% 32%, rgba(255,255,255,0.2) 0%, transparent 40%),
+    radial-gradient(circle at 65% 70%, rgba(0,200,180,0.2) 0%, transparent 45%),
+    radial-gradient(circle at 75% 25%, rgba(220,60,180,0.25) 0%, transparent 40%),
+    radial-gradient(circle at 30% 70%, rgba(100,40,220,0.35) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, #1a0830 20%, #060010 100%);
+
+  /* Chrome ring like Siri's outer edge */
+  box-shadow:
+    0 0 0 1.5px rgba(255,255,255,0.1),
+    0 0 0 2.5px rgba(155,77,255,0.25),
+    0 4px 18px rgba(0,0,0,0.9),
+    0 0 35px rgba(155,77,255,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    inset 0 -2px 8px rgba(0,0,0,0.7);
+
+  transition: box-shadow 0.5s ease;
+}
+
+/* Glass highlight — top sphere reflection */
+.cp-orb .orb-face::before {
+  content: "";
+  position: absolute;
+  top: 5px; left: 9px;
+  width: 22px; height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.3) 0%, transparent 80%);
+  transform: rotate(-25deg);
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Bottom depth shadow inside sphere */
+.cp-orb .orb-face::after {
+  content: "";
+  position: absolute;
+  bottom: 3px; left: 50%;
+  transform: translateX(-50%);
+  width: 34px; height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.55) 0%, transparent 80%);
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* Canvas for ribbons — sits between bg and glass */
+.cp-orb .orb-face canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Listening — purple glow */
+.cp-orb.orb-listening .orb-face {
+  box-shadow:
+    0 0 0 1.5px rgba(255,255,255,0.18),
+    0 0 0 2.5px rgba(155,77,255,0.7),
+    0 4px 18px rgba(0,0,0,0.8),
+    0 0 50px rgba(155,77,255,0.5),
+    0 0 85px rgba(155,77,255,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    inset 0 -2px 8px rgba(0,0,0,0.6);
+}
+
+/* Speaking — pink + teal glow like Siri responding */
+.cp-orb.orb-speaking .orb-face {
+  box-shadow:
+    0 0 0 1.5px rgba(255,255,255,0.18),
+    0 0 0 2.5px rgba(255,110,216,0.7),
+    0 4px 18px rgba(0,0,0,0.8),
+    0 0 50px rgba(255,110,216,0.45),
+    0 0 85px rgba(0,200,180,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    inset 0 -2px 8px rgba(0,0,0,0.6);
+}
+/* ===== Control Panel ===== */
+
+.cp-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  bottom: calc(var(--side-panel-width) + 40px);
+
+  width: 220px;
+
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+
+  border-radius: 24px;
+  z-index: 100;
+
+  overflow-y: auto;
+
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255,60,200,0.15), transparent 45%),
+    radial-gradient(circle at 80% 90%, rgba(50,150,255,0.15), transparent 50%),
+    linear-gradient(
+      160deg,
+      rgba(18,18,28,0.95),
+      rgba(10,10,18,0.98)
+    );
+
+  backdrop-filter: blur(28px) saturate(150%);
+
+  border: 1px solid rgba(255,255,255,0.06);
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.6),
+    0 0 120px rgba(255,80,200,0.12);
+
+  transform: translateX(120%);
+  transition: transform 0.45s cubic-bezier(.4,0,.2,1);
+}
+
+.cp-panel.show {
+  transform: translateX(0);
+}
+
+
+/* ===== Gradient Top Accent ===== */
+
+.cp-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+
+  border-radius: 20px 20px 0 0;
+
+  background: linear-gradient(
+    90deg,
+    #ff3cac,
+    #784ba0,
+    #2b86c5
+  );
+}
+
+/* ===== Section Title ===== */
+
+.cp-title {
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+}
+
+/* ===== Card ===== */
+
+.cp-card {
+  position: relative;
+  padding: 16px;
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,0.04),
+      rgba(255,255,255,0.02)
+    );
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    inset 0 0 20px rgba(255,255,255,0.02),
+    0 8px 30px rgba(0,0,0,0.5);
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ===== Buttons ===== */
+
+.cp-btn {
+  padding: 8px 12px;
+  font-size: 0.68rem;
+  border-radius: 12px;
+  border: none;
+
+  color: white;
+  cursor: pointer;
+
+  background: linear-gradient(
+    135deg,
+    #ff3cac,
+    #784ba0
+  );
+
+  box-shadow:
+    0 6px 20px rgba(255,60,160,0.4);
+
+  transition: all 0.2s ease;
+}
+
+.cp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 30px rgba(255,60,160,0.6);
+}
+
+/* Secondary buttons */
+
+.cp-btn:not(.cp-primary) {
+  background: linear-gradient(
+    135deg,
+    #2b86c5,
+    #36d1dc
+  );
+
+  box-shadow:
+    0 6px 20px rgba(50,180,255,0.35);
+}
+
+/* Danger */
+
+.cp-danger,
+.cp-danger-soft {
+  background: linear-gradient(
+    135deg,
+    #ff416c,
+    #ff4b2b
+  );
+
+  box-shadow:
+    0 6px 20px rgba(255,70,70,0.4);
+}
+
+/* ===== Draw Mode Visibility ===== */
+
+#userEditControls {
+  display: none;
+}
+
+body.edit-mode #userEditControls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.orb-core {
+  display: none; /* canvas ribbons + white core glow handle everything */
+}
+
+
+/* ================= Smooth Sliding Tip Box ================= */
+
+.cp-tip-box {
+  padding: 14px;
+  border-radius: 14px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.02)
+  );
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.9);
+
+  overflow: hidden;
+  position: relative;
+
+  transition: height 0.4s ease; /* smooth size change */
+}
+
+/* gradient accent */
+.cp-tip-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    #ff3cac,
+    #784ba0,
+    #2b86c5
+  );
+}
+
+/* slider wrapper */
+.tip-slider {
+  position: relative;
+  transition: transform 0.4s ease;
+}
+
+
+/* USER SPEAKING - Organic Green */
+body.user-speaking .particle {
+  background: linear-gradient(45deg, #00ffcc, #00ffaa);
+  transform: scale(1.3);
+  filter: blur(2px);
+}
+
+/* AI SPEAKING - Controlled Blue */
+body.ai-speaking .particle {
+  background: linear-gradient(45deg, #00bfff, #007bff);
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(0, 150, 255, 0.8);
+}
+
+/* ACTIVATION BOOM */
+body.orbital-activated::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle,
+      rgba(0,255,255,0.6) 0%,
+      rgba(0,150,255,0.4) 40%,
+      transparent 70%);
+  animation: energyBoom 1.2s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes energyBoom {
+  0%   { transform: scale(0.2); opacity: 1; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+
+/* ===== DEV CHAT PANEL ===== */
+#dev-chat-panel {
+  position: fixed;
+  top: 12px;
+  left: -100vw;
+  width: clamp(300px, 35vw, 440px);
+  height: calc(100vh - 24px);
+  max-height: calc(100vh - 24px);
+  box-sizing: border-box;
+  transition: left 0.35s cubic-bezier(.4,0,.2,1);
+
+  /* Black glass — dark but see-through like tinted glass */
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(0px) brightness(0.35);
+  -webkit-backdrop-filter: blur(0px) brightness(0.35);
+
+  /* Fully rounded on all corners */
+  border-radius: 16px;
+
+  /* White neon strip border — all 4 sides */
+  border: 2px solid rgba(255, 255, 255, 0.9);
+
+  /* Outer glow — tight strip, not a spread */
+  box-shadow:
+    0 0 6px  2px rgba(255, 255, 255, 0.85),
+    0 0 18px 4px rgba(255, 255, 255, 0.4),
+    0 0 40px 6px rgba(255, 255, 255, 0.15),
+    inset 0 0 8px rgba(255, 255, 255, 0.06);
+
+  display: flex;
+  flex-direction: column;
+  font-family: system-ui, sans-serif;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+#dev-chat-panel.open {
+  left: 290px;
+}
+
+#dev-chat-header {
+  padding: 20px 18px 15px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  text-align: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+#dev-chat-header::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 15%;
+  right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+}
+
+#dev-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+#dev-chat-messages::-webkit-scrollbar { width: 3px; }
+#dev-chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.12);
+  border-radius: 3px;
+}
+
+.chat-bubble {
+  max-width: 83%;
+  padding: 11px 15px;
+  font-size: 13px;
+  line-height: 1.6;
+  word-wrap: break-word;
+  border-radius: 14px;
+  animation: bubbleIn 0.2s cubic-bezier(.4,0,.2,1);
+  will-change: opacity, transform;
+}
+
+@keyframes bubbleIn {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.chat-user {
+  align-self: flex-end;
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-bottom-right-radius: 3px;
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.13),
+    0 0 24px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.chat-orbital {
+  align-self: flex-start;
+  background: rgba(110, 50, 210, 0.16);
+  color: rgba(225, 210, 255, 0.88);
+  border: 1px solid rgba(160, 100, 255, 0.42);
+  border-bottom-left-radius: 3px;
+  box-shadow:
+    0 0 12px rgba(140, 80, 255, 0.28),
+    0 0 28px rgba(140, 80, 255, 0.1),
+    inset 0 1px 0 rgba(190, 150, 255, 0.1);
+}
+
+
+/* ================================================================
+     MUSIC CINEMA MODE — all UI fades when music plays + user is idle
+     Class .mm-cinema toggled by JS. Only particles remain visible.
+     ================================================================ */
+  body.mm-cinema #controlPanel,
+  body.mm-cinema #devPanel,
+  body.mm-cinema #handStatus,
+  body.mm-cinema #skeleton,
+  body.mm-cinema #gestureHint,
+  body.mm-cinema #dev-chat-panel,
+  body.mm-cinema .cp-orb,
+  body.mm-cinema .orb-core,
+  body.mm-cinema .transition-core {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 1.8s ease !important;
+  }
+  body:not(.mm-cinema) #controlPanel,
+  body:not(.mm-cinema) #devPanel,
+  body:not(.mm-cinema) #handStatus,
+  body:not(.mm-cinema) #skeleton,
+  body:not(.mm-cinema) #gestureHint,
+  body:not(.mm-cinema) #dev-chat-panel,
+  body:not(.mm-cinema) .cp-orb,
+  body:not(.mm-cinema) .orb-core,
+  body:not(.mm-cinema) .transition-core {
+    transition: opacity 0.9s ease !important;
+  }
+
+  </style>
+</head>
+<body>
+<div id="mm-tint" style="position:fixed;inset:0;pointer-events:none;z-index:999;opacity:0;transition:opacity 3s ease;background:radial-gradient(circle at center, rgba(155,77,255,0.18), transparent 65%);"></div>
+
+<div id="loader">
+  <div id="loader-fallback" style="
+    width:40px;height:40px;border-radius:50%;
+    border:2px solid rgba(155,77,255,0.15);
+    border-top:2px solid #9b4dff;
+    animation:spin 1s linear infinite;
+    position:absolute;
+  "></div>
+</div>
+
+<div id="edgeLight"></div>
+
+<div id="handStatus" class="lost" style="display:none;">Hand not detected</div>
+<canvas id="skeleton" width="300" height="300" style="display:none;"></canvas>
+
+<canvas id="shapeEditor"></canvas>
+
+<video id="video" autoplay muted playsinline style="opacity:0; transform: scaleX(-1)"></video>
+
+
+<!-- ================= DEV OVERLAY (HIDDEN) ================= -->
+<div id="devPanel">
+  <div class="dev-title">DEV MODE</div>
+
+<button id="devProfileBtn"
+style="
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #222;
+  color: #ccc;
+">
+  TOGGLE PROFILE (DEV)
+</button>
+
+<button id="devShapeBtn"
+style="
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #1a0f2e;
+  color: #c9b6ff;
+">
+  NEXT SHAPE (DEV)
+</button>
+
+
+<button id="devEditBtn"
+style="
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #2b1d4a;
+  color: #ffddb0;
+">
+  TOGGLE EDIT MODE (DEV)
+</button>
+
+
+<button id="devGenerateBtn"
+style="
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #140b24;
+  color: #9bffd8;
+">
+  GENERATE SHAPE (DEV)
+</button>
+
+  <hr style="margin:10px 0; border-color: rgba(255,255,255,0.1);">
+
+  <div class="dev-section">
+  <b>Dev Mood Control</b>
+
+  <div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+    <button class="devMoodBtn" data-vibe="calm">Calm</button>
+    <button class="devMoodBtn" data-vibe="focused">Focused</button>
+    <button class="devMoodBtn" data-vibe="energetic">Energetic</button>
+    <button class="devMoodBtn" data-vibe="mystic">Mystic</button>
+  </div>
+</div>
+
+<div class="dev-section">
+  <b>Admin Controls</b>
+
+  <div style="margin:6px 0">
+    <label>
+      <input type="checkbox" id="devAdminToggle">
+      Force Admin Mode
+    </label>
+  </div>
+
+  <div style="margin-top:8px">
+  Morph Speed: <span id="devMorphVal">1.00</span>
+  <input type="range" id="devMorph" min="0.5" max="2" step="0.05" value="1">
+</div>
+
+
+  <div>
+    Glow Boost
+    <input type="range" id="devGlow" min="0.5" max="2" step="0.05" value="1">
+  </div>
+
+  <div>
+    Motion Damp
+    <input type="range" id="devMotion" min="0.5" max="2" step="0.05" value="1">
+  </div>
+
+  <div>
+    Breathe Speed
+    <input type="range" id="devBreathe" min="0.5" max="2" step="0.05" value="1">
+  </div>
+
+</div>
+
+  <button id="devResetAdmin"
+style="
+  width:100%;
+  margin-top:8px;
+  padding:6px;
+  border-radius:6px;
+  border:none;
+  background:#111;
+  color:#ff6a6a;
+">
+  RESET ADMIN OVERRIDES
+</button>
+
+
+
+  <div class="dev-section">
+    <b>Rendering</b>
+    <div>FPS: <span id="dev-fps">–</span></div>
+    <div>Frame time: <span id="dev-ms">–</span> ms</div>
+    <div>Particles: <span id="dev-particles">–</span></div>
+    <div>Shape: <span id="dev-shape">–</span></div>
+    <div>Profile: <span id="dev-profile">–</span></div>
+    <canvas id="devGraph" width="230" height="50"></canvas>
+  </div>
+
+  <div style="margin-top:6px">
+  Frame Load:
+  <div style="background:#222;height:6px;border-radius:3px;overflow:hidden">
+    <div id="dev-heat"
+         style="height:100%;width:0%;background:#9b4dff"></div>
+  </div>
+</div>
+
+
+  <div class="dev-section">
+    <b>Hands</b>
+    <div>Hands detected: <span id="dev-hands">–</span></div>
+    <div>Openness: <span id="dev-open">–</span></div>
+    <div>Depth: <span id="dev-depth">–</span></div>
+  </div>
+
+  <div class="dev-section">
+    <b>Performance</b>
+    <div>perfLevel: <span id="dev-perf">–</span></div>
+    <div>Tier: <span id="dev-tier">–</span></div>
+    <div>Edge Perf: <span id="dev-edge">–</span></div>
+    <div>Runtime locked: <span id="dev-lock">–</span></div>
+  </div>
+
+  <div class="dev-section">
+  <b>Edge / Ambient</b>
+  <div>Ambient: <span id="dev-ambient">–</span></div>
+  <div>DarkState: <span id="dev-dark">–</span></div>
+  </div>
+
+    <!-- ===== DEV CHAT PANEL ===== -->
+  <div id="dev-chat-panel">
+    <div id="dev-chat-header">Orbital Chat</div>
+    <div id="dev-chat-messages"></div>
+  </div>
+
+</div>
+
+<div id="intro"></div>
+
+<div id="welcomeLayer">
+  <div id="welcomeText">
+    <div class="welcome-line">Welcome</div>
+    <div class="welcome-name"></div>
+  </div>
+</div>
+
+<div id="transitionVeil"></div>
+
+<div id="gestureHint" style="
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+padding:10px 22px;
+border-radius:20px;
+background:rgba(0,0,0,0.6);
+color:#ccc;
+font-size:12px;
+letter-spacing:1px;
+z-index:15;
+opacity:0;
+transition:opacity 0.6s ease;
+pointer-events:none;
+">
+Move your hand to rotate · Open palm to scale · Two hands to switch shapes
+</div>
+
+<!-- ===== CREATE PROFILE MODAL ===== -->
+
+<!-- ===== AUTH MODAL ===== -->
+<div id="createProfileModal" class="profile-modal hidden">
+  <form class="profile-modal-card" autocomplete="off">
+
+    <input type="text" style="display:none">
+    <input type="password" style="display:none">
+
+    <div class="auth-header">
+      <div class="auth-title">Orbital Access</div>
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab" data-mode="register">Register</button>
+        <button type="button" class="auth-tab active" data-mode="login">Login</button>
+      </div>
+    </div>
+
+    <div class="auth-body">
+
+      <label>
+        Username
+        <input 
+      id="newProfileName" 
+      placeholder="Enter username" 
+      autocomplete="new-password"
+/>
+      </label>
+
+      <label>
+        Password
+        <input 
+        id="newProfilePassword" 
+        type="password" 
+        placeholder="Enter password"
+        autocomplete="new-password"
+      />
+      </label>
+
+      <div id="registerExtras">
+
+        <label>
+          Gender
+          <select id="newProfileGender">
+            <option value="neutral">Neutral</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </label>
+
+        <label>
+          Vibe
+          <div class="pill-group" id="vibeGroup">
+            <button type="button" class="pill active" data-vibe="calm">Calm</button>
+            <button type="button" class="pill" data-vibe="focused">Focused</button>
+            <button type="button" class="pill" data-vibe="energetic">Energetic</button>
+            <button type="button" class="pill" data-vibe="mystic">Mystic</button>
+          </div>
+        </label>
+
+      </div>
+
+      <button id="authSubmitBtn" class="auth-submit">
+        Enter
+      </button>
+
+    </div>
+
+  </form>
+</div>
+
+<div id="loginTransition" class="login-transition hidden">
+  <div class="transition-core"></div>
+</div>
+
+<!-- ================= USER CONTROL CONSOLE ================= -->
+
+<button id="settingsTrigger" class="cp-orb">
+  <div class="orb-face">
+    <canvas id="orbWaveCanvas" width="54" height="54"></canvas>
+    <span class="orb-core"></span>
+  </div>
+</button>
+
+<!-- ================= CONTROL PANEL ================= -->
+<aside id="controlPanel" class="cp-panel">
+
+  <div class="cp-header">
+    <span class="cp-title">CONTROL INTERFACE</span>
+  </div>
+
+  <div class="cp-card">
+
+    <button id="userEditToggle" class="cp-btn cp-primary">
+    ✦ Draw Mode
+    </button>
+
+    <button id="musicModeBtn" class="cp-btn" style="
+      background: linear-gradient(135deg, #7b2fff, #ff3cac);
+      box-shadow: 0 6px 20px rgba(155,50,255,0.4);
+      margin-top: 6px;
+    ">
+      ♫ Music Mode
+    </button>
+
+    <div id="userEditControls" class="cp-edit-group">
+
+      <button id="userGenerateBtn" class="cp-btn">
+        Generate Shape
+      </button>
+
+      <button id="userClearBtn" class="cp-btn cp-danger">
+        Clear Canvas
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="cp-tip-box">
+  <div class="tip-slider">
+    <p id="autoTip"></p>
+  </div>
+  </div>
+  
+
+  <div class="cp-card">
+
+    <button id="userLogoutBtn" class="cp-btn cp-danger-soft">
+      Logout
+    </button>
+
+  </div>
+
+</aside>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="orbital-intro.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script src="config.js"></script>
+<script src="memory.js"></script>
+<script src="musicMode.js"></script>
+
+<script type="module">
+  import { initOrbitalVoice, getUserAudioEnergy } from "./orbitalVoice.js";
+
+function assertRuntimeUnlocked() {
+  return !runtimeLocked;
+}
+
+
+function showIntro() {
+  // no-op: 3D intro now runs as the loader (orbital-intro.js)
+}
+
+function showWelcomeMessage(username) {
+
+  if (!animationRunning) {
+  animationRunning = true;
+  lastFrameTime = performance.now();
+  animate();
+}
+
+  const layer = document.getElementById('welcomeLayer');
+  const text = document.getElementById('welcomeText');
+  const nameEl = text.querySelector('.welcome-name');
+
+  nameEl.textContent = username.toUpperCase();
+
+// Apply vibe gradient to welcome name
+const vibe = window.ACTIVE_VIBE || "calm";
+const [c1, c2] = VIBE_COLORS[vibe] || VIBE_COLORS["calm"];
+
+nameEl.style.background = `
+  linear-gradient(
+    180deg,
+    ${c2},
+    ${c1}
+  )
+`;
+
+nameEl.style.webkitBackgroundClip = "text";
+nameEl.style.webkitTextFillColor = "transparent";
+nameEl.style.textShadow = `0 0 80px ${c1}`;
+
+  text.classList.remove('show', 'hide');
+
+  requestAnimationFrame(() => {
+    text.classList.add('show');
+  });
+
+  setTimeout(() => {
+  text.classList.add('hide');
+
+  // 🔓 START PARTICLES WHILE TEXT FADES
+  visualsReady = true;
+  renderer.domElement.style.opacity = "1";
+  renderer.render(scene, camera);
+}, 2400);
+
+setTimeout(() => {
+  layer.remove();
+}, 4200);
+
+}
+
+
+// ==================== THREE SETUP ====================
+
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 130;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+renderer.domElement.style.position = "fixed";
+renderer.domElement.style.top = "0";
+renderer.domElement.style.left = "0";
+renderer.setClearColor(0x000000, 0);
+
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+
+renderer.domElement.style.opacity = "0";
+renderer.domElement.style.pointerEvents = "none";
+renderer.domElement.style.transition = "opacity 1.2s ease";
+renderer.domElement.style.display = 'block';
+
+
+scene.add(new THREE.AmbientLight(0x552266, 0.4));
+const dirLight = new THREE.DirectionalLight(0xbb88ff, 1.1);
+dirLight.position.set(1, 1, 1);
+scene.add(dirLight);
+
+
+  async function benchmarkParticles(renderer, scene, camera) {
+  const testSteps = [10000, 16000, 22000, 28000];
+  let best = testSteps[0];
+
+  const geo = new THREE.BufferGeometry();
+  const mat = new THREE.PointsMaterial({ size: 1 });
+
+  for (const count of testSteps) {
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count * 3; i++) {
+      pos[i] = (Math.random() - 0.5) * 100;
+    }
+
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const pts = new THREE.Points(geo, mat);
+    scene.add(pts);
+
+    // warmup
+    for (let i = 0; i < 10; i++) renderer.render(scene, camera);
+
+    let worst = 0;
+    let sum = 0;
+    const frames = 12;
+
+    for (let i = 0; i < frames; i++) {
+      const t0 = performance.now();
+      renderer.render(scene, camera);
+      const dt = performance.now() - t0;
+      sum += dt;
+      worst = Math.max(worst, dt);
+    }
+
+    scene.remove(pts);
+    geo.dispose();
+    mat.dispose();
+
+
+    const avg = sum / frames;
+
+    if (avg > 20 || worst > 30) break;
+    best = count;
+  }
+
+  return Math.floor(best * 0.85); // safety margin
+}
+
+
+let lastRotX = 0;
+let lastRotY = 0;
+let lastRotZ = 0;
+
+// ===== CONTROL LINK (C + D ENTRY SYSTEM) =====
+let controlLink = 0;              // 0 → no control, 1 → full control
+let controlLinkTarget = 0;
+let controlLinkStart = 0;
+let controlLinkActive = false;
+const CONTROL_FADE_DURATION = 160;   // ms fade-in time
+
+// ===== HYBRID ROTATION SYSTEM =====
+let rotVelX = 0;
+let rotVelY = 0;
+let rotVelZ = 0;
+
+// ===== ACCELERATION-BASED IMPULSE SYSTEM =====
+let prevHandSpeed = 0;
+let impulseCooldown = false;
+let impulseTimer = 0;
+
+const DEAD_ZONE = 0.01;               // ignore tiny jitter
+const ACCEL_THRESHOLD = 0.02;         // acceleration trigger
+const SPEED_THRESHOLD = 0.03;         // sustained speed trigger
+const MAX_ROT_VEL = 0.25;             // cap spin
+const IMPULSE_COOLDOWN_MS = 250;      // prevent stacking
+let previousShapeBeforeEdit = null;
+
+
+let lastHandX = 0;
+let lastHandY = 0;
+let lastHandRoll = 0;
+
+const FOLLOW_STRENGTH = 0.18;
+const IMPULSE_THRESHOLD = 0.035;
+const IMPULSE_POWER = 1.6;
+const INERTIA_FRICTION = 0.96;
+const BRAKE_POWER = 0.08;
+
+
+const SHAPES = ['sphere', 'infinity', 'heart', 'saturn', 'spiral', 'butterfly'];
+window.SHAPES = SHAPES;
+
+
+//================== Global Variables ================
+let experienceStarted = false;
+let runtimeLocked = false;
+let currentShapeIndex = 0;
+// Expose for cross-module access (orbitalVoice.js)
+Object.defineProperty(window, 'currentShapeIndex', {
+  get: () => currentShapeIndex,
+  set: (v) => { currentShapeIndex = v; },
+  configurable: true
+});
+let previousShapeIndex = 0;
+let lastTwoHandDistance = null;
+let twoHandCooldown = false;
+let isMorphing = false;
+let normalsDirty = false;
+const MORPH_EPSILON = 0.002;
+let twoHandArmed = false;
+let twoHandStartTime = 0;
+let rawDepth = 0;
+let baseHandSize = null;
+let handSize = 0;
+let saturnRingStart = 0;
+let saturnRingCount = 0;
+let ringAngle = 0;
+const GAP_FADE_START = 42;
+const GAP_FADE_END   = 48;
+let saturnRingBase = null;
+let midColor = new THREE.Color();
+let highlightColor = new THREE.Color();
+
+//Spiral animation Constants
+let spiralBase = null;
+let spiralPhase = 0;
+let spiralCorePhase = 0;
+
+
+// light hit
+let handDepth = 0;
+let gestureAccum = 0;
+const GESTURE_THRESHOLD = 0.045;
+let lastTier = null;
+let butterflyTime = 0;
+
+
+const TWO_HAND_ARM_DELAY = 250; // ms
+let shapeTextureBias = {
+  size: 1.35,
+  alpha: 0.25
+};
+let colorUpdateCooldown = 0;
+let colorFrameSkip = 0;
+
+let smoothedLandmarks = null;
+const LANDMARK_SMOOTH = 0.25; // higher = smoother, lower = snappier
+let isLocked = false;
+let lockProgress = 0;          // 0 → 1
+
+const LOCK_PROGRESS_SPEED = 0.0042;   // faster lock/unlock
+const LOCK_DECAY_SPEED = 0.0012;      // slower decay (stability)
+let frozenRotX = 0;
+let frozenRotY = 0;
+let frozenRotZ = 0;
+let frozenScale = 1;
+let frozenDepth = 0;
+let depthFactor = 0;
+let lockRing = null;
+let lockRingMaterial = null;
+let lastShapeSwitchTime = 0;
+const SHAPE_SWITCH_COOLDOWN_MS = 500;
+let stableHands = {
+  left: null,
+  right: null
+};
+const HAND_SMOOTH = 0.5; // 0.6 = snappy, 0.8 = very smooth
+let smoothTwoHandDist = null;
+let lastTwoHandOpenness = null;
+
+let smoothOpennessDelta = 0;
+let closingIntentStart = null;
+let openingIntentStart = null;
+let darkState = false;
+let handStableSince = null;
+let edgeLightPerfMode = false;
+let edgeLightActive = false;
+const PERF_ON_OPACITY  = 0.7;
+const PERF_OFF_OPACITY = 0.3;
+let smoothedEdgeOpacity = 0;
+let smoothedAmbient = 1;
+const EDGE_OPACITY_SEARCH  = 1.0;  // no hands
+const EDGE_OPACITY_ACQUIRE = 0.65; // hands just appeared
+const EDGE_OPACITY_TRACK   = 0.25; // hands stable
+const HAND_STABLE_TIME = 600; // ms
+const edgeLightEl = document.getElementById('edgeLight');
+let galaxyTick = 0;
+let loaderVideoFinished = false;
+let systemReady = false;
+let devMode = false;
+let devForceProfile = null; // null | 'FULL' | 'EDGE'
+let fps = 0;
+let fpsFrames = 0;
+let fpsLastTime = performance.now();
+const graphCanvas = document.getElementById('devGraph');
+const graphCtx = graphCanvas.getContext('2d');
+
+const GRAPH_POINTS = 60;
+let fpsHistory = new Array(GRAPH_POINTS).fill(60);
+
+let lastGraphUpdate = performance.now();
+const GRAPH_UPDATE_INTERVAL = 250; // ms (4 times/sec)
+let lastDevUpdate = 0;
+const DEV_UPDATE_INTERVAL = GRAPH_UPDATE_INTERVAL;
+let lastHandCount = 0;
+let lastHandSeenTime = performance.now();
+const HAND_LOSS_GRACE_MS = 120;
+let selectedVibe = "calm";
+const BASE_SCALE = 1.75;
+const tempColor = new THREE.Color();
+
+
+// ================= DUAL STILLNESS EDIT GESTURE =================
+let dualStillActive = false;
+let dualStillStart = 0;
+let dualStillCooldownUntil = 0;
+
+const DUAL_OPEN_THRESHOLD = 0.75;
+const DUAL_CLOSED_THRESHOLD = 0.25;
+const DUAL_HOLD_TIME = 900;        // ms
+const DUAL_MOVE_THRESHOLD = 0.0025;
+
+
+let audioPulsePhase = 0;
+let sleepCollapse = 0;
+
+// ================= APP MODE SYSTEM =================
+const APP_MODE = {
+  VIEW: "view",
+  EDIT: "edit"
+};
+
+let currentMode = APP_MODE.VIEW;
+let savedParticleSize = null;
+let customMorphBoost = 1;
+let customShapeActive = false;
+
+let vibeSettings = {
+  morphSpeed: 1,
+  motionDamp: 1,
+  glowBoost: 1,
+  colorShift: 0,
+  breatheSpeed: 1,
+  depthSoftness: 1
+};
+
+
+const VIBE_COLORS = {
+  calm:      ["#6fa8ff", "#b6e0ff"],   // cool blue → sky
+  focused:   ["#3dffd0", "#8bffe8"],   // mint → cyan
+  energetic: ["#ff6a00", "#ffcf4a"],   // hot orange → yellow
+  mystic:    ["#7b3cff", "#ff6fd8"]    // violet → magenta
+};
+
+// ===== SHAPE COLOR PROFILES =====
+const SHAPE_COLORS = {
+  sphere: {
+    mid: new THREE.Color('#6a3cff'),
+    highlight: new THREE.Color('#c9b6ff')
+  },
+  infinity: {
+    mid: new THREE.Color('#00ffd5'),
+    highlight: new THREE.Color('#bafff3')
+  },
+  heart: {
+    mid: new THREE.Color('#ff3b6f'),
+    highlight: new THREE.Color('#ffd1dc')
+  },
+  saturn: {
+    mid: new THREE.Color('#ffb86b'),
+    highlight: new THREE.Color('#fff1c1')
+  },
+  butterfly: {
+  mid: new THREE.Color('#ff6fd8'),
+  highlight: new THREE.Color('#ffe3ff')
+},
+spiral: {
+  mid: new THREE.Color('#ffffff'),
+  highlight: new THREE.Color('#ffffff')
+},
+
+
+};
+
+// ================= PERFORMANCE GOVERNOR =================
+let lastFrameTime = performance.now();
+let avgFrameTime = 16.6; // ms
+let perfLevel = 1.0;     // 1 = full, 0.7 = reduced, 0.5 = survival
+
+function updatePerfLevel(dt) {
+  avgFrameTime = avgFrameTime * 0.9 + dt * 0.1;
+
+  if (avgFrameTime > 24)      perfLevel = 0.5;
+  else if (avgFrameTime > 20) perfLevel = 0.7;
+  else                        perfLevel = 1.0;
+}
+
+// ==================== PLAN B : SIMULATION TIERS ====================
+const SIMULATION_TIER = {
+  FULL: 0,
+  REDUCED: 1,
+  IDLE: 2
+};
+
+let currentTier = SIMULATION_TIER.FULL;
+
+
+// ==================== PLAN B : TIER DECISION ====================
+function updateSimulationTier() {
+  if (!experienceStarted) {
+    currentTier = SIMULATION_TIER.IDLE;
+    return;
+  }
+
+  if (edgeLightActive || perfLevel < 0.8) {
+    currentTier = SIMULATION_TIER.REDUCED;
+    return;
+  }
+
+  currentTier = SIMULATION_TIER.FULL;
+}
+
+
+let ambientLightLevel = 1;
+
+
+const tips = [
+  "Move slowly to gently attract particles.",
+  "Switch to Draw Mode to design your own flow.",
+  "Try fast gestures to create burst effects.",
+  "Changing vibe alters motion personality.",
+  "Use Clear to reset and experiment again."
+];
+
+const tipBox = document.querySelector(".cp-tip-box");
+const tipSlider = document.querySelector(".tip-slider");
+
+let tipIndex = 0;
+
+function updateTip(newText) {
+  // Create temporary element to measure new height
+  const temp = document.createElement("p");
+  temp.style.visibility = "hidden";
+  temp.style.position = "absolute";
+  temp.style.width = tipBox.offsetWidth - 28 + "px";
+  temp.textContent = newText;
+  document.body.appendChild(temp);
+
+  const newHeight = temp.offsetHeight + 28;
+  document.body.removeChild(temp);
+
+  // Set container to current height first
+  tipBox.style.height = tipBox.offsetHeight + "px";
+
+  // Slide out
+  tipSlider.style.transform = "translateY(-10px)";
+  tipSlider.style.opacity = "0";
+
+  setTimeout(() => {
+    tipSlider.innerHTML = `<p>${newText}</p>`;
+    tipSlider.style.transform = "translateY(10px)";
+    tipSlider.style.opacity = "0";
+
+    tipBox.style.height = newHeight + "px";
+
+    setTimeout(() => {
+      tipSlider.style.transform = "translateY(0)";
+      tipSlider.style.opacity = "1";
+    }, 50);
+  }, 300);
+}
+
+updateTip(tips[tipIndex]);
+
+setInterval(() => {
+  tipIndex = (tipIndex + 1) % tips.length;
+  updateTip(tips[tipIndex]);
+}, 5000);
+
+// ==================== PARTICLES ====================
+let MAX_PARTICLES = 24000;
+let effectiveParticleCount = MAX_PARTICLES;
+
+let galaxyBase = null;
+let galaxyPhase = null;
+
+
+const geometry = new THREE.BufferGeometry();
+const positions = new Float32Array(MAX_PARTICLES * 3);
+const baseFramePositions = new Float32Array(MAX_PARTICLES * 3);
+const targetPositions = new Float32Array(MAX_PARTICLES * 3);
+const normals = new Float32Array(MAX_PARTICLES * 3);
+const baseColor = new THREE.Color('#6a0dad');
+const lightDir = new THREE.Vector3(1, 0.6, 0.8).normalize();
+
+
+function generateInfinity() {
+  const a = 30;
+
+  for (let i = 0; i < effectiveParticleCount; i++) {
+    const t = Math.random() * Math.PI * 2;
+
+    // ---- ORIGINAL CENTER CURVE (UNCHANGED) ----
+    const cx = a * Math.sin(t);
+    const cz = a * Math.sin(t) * Math.cos(t);
+
+    // ---- CURVED VERTICAL LIFT (FIXED) ----
+    // replaces flat Math.sin(t * 2)
+    const curveLift = Math.sin(t) * Math.cos(t);
+    const cy = curveLift * 18;
+
+    // ---- TRUE CIRCULAR TUBE ----
+    const tubeR = 4 * Math.sqrt(Math.random());
+    const tubeAngle = Math.random() * Math.PI * 2;
+
+    // perpendicular direction (stable)
+    const dx = a * Math.cos(t);
+    const dz = a * (Math.cos(t) * Math.cos(t) - Math.sin(t) * Math.sin(t));
+    const len = Math.hypot(dx, dz) || 1;
+
+    const px = -dz / len;
+    const pz = dx / len;
+
+    const x = cx + px * Math.cos(tubeAngle) * tubeR;
+    const y = cy + Math.sin(tubeAngle) * tubeR;
+    const z = cz + pz * Math.cos(tubeAngle) * tubeR;
+
+    const scale = 1.6;
+
+    targetPositions[i * 3]     = x * scale;
+    targetPositions[i * 3 + 1] = y * scale;
+    targetPositions[i * 3 + 2] = z * scale;
+  }
+}
+
+
+
+function generateHeart() {
+  const scale = 2.3;
+
+  for (let i = 0; i < effectiveParticleCount; i++) {
+    const t = Math.random() * Math.PI * 2;
+
+    // Balanced bias: outline + volume
+    const bias = Math.pow(Math.random(), 0.5);
+
+    // Classic heart curve
+    const hx =
+      16 * Math.pow(Math.sin(t), 3);
+
+    const hy =
+      13 * Math.cos(t)
+      - 5 * Math.cos(2 * t)
+      - 2 * Math.cos(3 * t)
+      - Math.cos(4 * t);
+
+    // Partial hollow (NOT empty)
+    const fill = THREE.MathUtils.lerp(0.6, 1.0, bias);
+
+    const x = hx * fill * scale;
+    const y = hy * fill * scale;
+
+    // 👉 THIS is the thickness fix
+    const z =
+      (Math.random() - 0.5) *
+      THREE.MathUtils.lerp(6.0, 12.0, bias);
+
+    targetPositions[i * 3]     = x;
+    targetPositions[i * 3 + 1] = y;
+    targetPositions[i * 3 + 2] = z;
+  }
+}
+
+
+
+function generateSaturn() {
+  const activeCount = effectiveParticleCount;
+  const coreCount = Math.floor(activeCount * 0.55);
+  saturnRingStart = coreCount;
+  saturnRingCount = activeCount - coreCount;
+
+
+  // ---------- HALF-SPHERE CORE ----------
+  for (let i = 0; i < coreCount; i++) {
+    const u = Math.random();
+    const v = Math.random();
+
+    const theta = 2 * Math.PI * u;
+    const phi = Math.acos(2 * v - 1);
+
+    const radius = 28 + (Math.random() - 0.5) * 1.0;
+
+    let x = radius * Math.sin(phi) * Math.cos(theta);
+    const y = radius * Math.cos(phi);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+
+    if (x < 0) x *= -1; // clean hemisphere cut
+
+    targetPositions[i * 3]     = x;
+    targetPositions[i * 3 + 1] = y;
+    targetPositions[i * 3 + 2] = z;
+  }
+
+  // ---------- RINGS ----------
+  for (let i = 0; i < saturnRingCount; i++) {
+    const idx = coreCount + i;
+    const angle = Math.random() * Math.PI * 2;
+
+    const inner = 42;
+    const outer = 64;
+
+    const radius =
+      inner + Math.pow(Math.random(), 1.6) * (outer - inner);
+
+    const band = Math.sin(radius * 0.45) * 1.2;
+    const finalRadius = radius + band;
+
+    const thickness = (Math.random() - 0.5) * 0.8;
+
+    targetPositions[idx * 3]     = finalRadius * Math.cos(angle);
+    targetPositions[idx * 3 + 1] = thickness;
+    targetPositions[idx * 3 + 2] = finalRadius * Math.sin(angle);
+  }
+
+  // ---------- STORE BASE RING POSITIONS ----------
+  saturnRingBase = new Float32Array(saturnRingCount * 2);
+
+  for (let i = 0; i < saturnRingCount; i++) {
+    const idx = saturnRingStart + i;
+    saturnRingBase[i * 2]     = targetPositions[idx * 3];
+    saturnRingBase[i * 2 + 1] = targetPositions[idx * 3 + 2];
+  }
+}
+
+
+function generateSpiral() {
+
+  const arms = 4;
+  const radiusMax = 95;
+  const spin = 2.8;
+  const armSpread = 0.18;     // smaller = cleaner arms
+  const coreRadius = 20;
+
+  for (let i = 0; i < effectiveParticleCount; i++) {
+
+    const r = Math.pow(Math.random(), 1.5) * radiusMax;
+
+    const armIndex = Math.floor(Math.random() * arms);
+    const armOffset = (armIndex / arms) * Math.PI * 2;
+
+    const angle =
+      armOffset +
+      r * 0.045 * spin +
+      (Math.random() - 0.5) * armSpread;
+
+    let x = Math.cos(angle) * r;
+    let z = Math.sin(angle) * r;
+
+    // Dense clean core
+    if (r < coreRadius) {
+      x *= 0.55;
+      z *= 0.55;
+    }
+
+    const y =
+      (Math.random() - 0.5) *
+      THREE.MathUtils.lerp(18, 4, r / radiusMax);
+
+    targetPositions[i * 3]     = x;
+    targetPositions[i * 3 + 1] = y;
+    targetPositions[i * 3 + 2] = z;
+  }
+  // store clean base
+spiralBase = new Float32Array(targetPositions);
+
+}
+
+function createBackgroundStars() {
+
+  const starGeo = new THREE.BufferGeometry();
+  const starCount = 2000;
+  const starPos = new Float32Array(starCount * 3);
+
+  for (let i = 0; i < starCount; i++) {
+    starPos[i * 3]     = (Math.random() - 0.5) * 2000;
+    starPos[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+    starPos[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+  }
+
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+
+  const starMat = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 1,
+    transparent: true,
+    opacity: 0.3
+  });
+
+  const stars = new THREE.Points(starGeo, starMat);
+  scene.add(stars);
+}
+
+createBackgroundStars();
+
+
+
+function generateButterfly() {
+
+  const scale = 6.5;
+
+  for (let i = 0; i < effectiveParticleCount; i++) {
+
+    const t = Math.random() * Math.PI * 2;
+
+    // classic butterfly curve
+    const r =
+      Math.exp(Math.cos(t))
+      - 2 * Math.cos(4 * t)
+      + Math.pow(Math.sin(t / 12), 5);
+
+    const x = Math.sin(t) * r * scale;
+    const y = Math.cos(t) * r * scale;
+
+    // depth thickness (wing body separation)
+    const depth =
+      (Math.random() - 0.5) *
+      THREE.MathUtils.lerp(22, 6, Math.abs(Math.sin(t)));
+
+    targetPositions[i * 3]     = x;
+    targetPositions[i * 3 + 1] = y * 1.25;
+    targetPositions[i * 3 + 2] = depth;
+  }
+}
+
+
+
+function generateSphere() {
+  const radius = 45;
+
+  for (let i = 0; i < effectiveParticleCount; i++) {
+    // uniform surface distribution
+    const u = Math.random();
+    const v = Math.random();
+
+    const theta = 2 * Math.PI * u;
+    const phi   = Math.acos(1 - 2 * v);
+
+    // slight surface noise (organic, not blobby)
+    const r = radius + (Math.random() - 0.5) * 1.2;
+
+    targetPositions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+    targetPositions[i * 3 + 1] = r * Math.cos(phi);
+    targetPositions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+  }
+}
+
+
+//==============================Shapes ENDS=================================
+
+
+function switchShape(dir) {
+  if (isMorphing) return;
+
+  previousShapeIndex = currentShapeIndex;
+  customShapeActive = false;
+  // clear transient gesture memory (safe, deterministic)
+  gestureAccum = 0;
+  lastTwoHandDistance = null;
+  lastTwoHandOpenness = null;
+  closingIntentStart = null;
+  openingIntentStart = null;
+
+  // arm a short cooldown to avoid an accidental immediate flip
+  twoHandCooldown = true;
+  lastShapeSwitchTime = performance.now();
+
+  currentShapeIndex =
+  (currentShapeIndex + dir + SHAPES.length) % SHAPES.length;
+
+// ✅ DEFINE SHAPE (MISSING — THIS CAUSED CRASH)
+const shape = SHAPES[currentShapeIndex];
+
+// ===== APPLY SHAPE COLOR PROFILE =====
+const profile = SHAPE_COLORS[shape];
+if (profile) {
+  midColor.copy(profile.mid);
+  highlightColor.copy(profile.highlight);
+  material.uniforms.uMidColor.value.copy(profile.mid);
+  material.uniforms.uHighlightColor.value.copy(profile.highlight);
+
+} 
+
+  // ----- RESET SATURN STATE WHEN LEAVING IT -----
+if (shape !== 'saturn') {
+  saturnRingStart = 0;
+  saturnRingCount = 0;
+  saturnRingBase = null;
+  ringAngle = 0;
+}
+
+
+  // ---- Shape geometry ----
+  if (shape === 'sphere') generateSphere();
+  if (shape === 'infinity') generateInfinity();
+  if (shape === 'heart') generateHeart();
+  if (shape === 'saturn') generateSaturn();
+  if (shape === 'spiral') generateSpiral();
+  if (shape === 'butterfly') generateButterfly();
+
+
+
+  // ---- Texture bias per shape ----
+  if (shape === 'sphere') {
+    shapeTextureBias.size = 1.3;
+    shapeTextureBias.alpha = 0.22;
+  } else if (shape === 'infinity') {
+    shapeTextureBias.size = 1.35;
+    shapeTextureBias.alpha = 0.26;
+  } else if (shape === 'heart') {
+    shapeTextureBias.size = 1.45;
+    shapeTextureBias.alpha = 0.2;
+  } else if (shape === 'saturn') {
+    shapeTextureBias.size = 1.25;
+    shapeTextureBias.alpha = 0.32;
+  }
+
+  isMorphing = true;
+  normalsDirty = true;
+
+  particles.rotation.set(0, 0, 0);
+
+  camera.position.x = 0;
+  camera.position.y = 0;
+  camera.position.z = 130;
+
+
+  lastRotX = particles.rotation.x;
+  lastRotY = particles.rotation.y;
+  lastRotZ = particles.rotation.z;
+
+  // Face butterfly toward camera
+if (shape === 'butterfly') {
+  particles.rotation.y = Math.PI / 2;
+}
+
+
+}
+
+function regenerateCurrentProceduralShape() {
+
+  const shape = SHAPES[currentShapeIndex];
+
+  if (shape === 'sphere') generateSphere();
+  if (shape === 'infinity') generateInfinity();
+  if (shape === 'heart') generateHeart();
+  if (shape === 'saturn') generateSaturn();
+  if (shape === 'spiral') generateSpiral();
+  if (shape === 'butterfly') generateButterfly();
+
+
+  isMorphing = true;
+  normalsDirty = true;
+}
+
+
+
+//MOrph function
+function recomputeNormals() {
+  for (let i = 0; i < effectiveParticleCount; i++) {
+    const x = positions[i * 3];
+    const y = positions[i * 3 + 1];
+    const z = positions[i * 3 + 2];
+
+    const len = Math.sqrt(x*x + y*y + z*z) || 1;
+
+    normals[i * 3]     = x / len;
+    normals[i * 3 + 1] = y / len;
+    normals[i * 3 + 2] = z / len;
+  }
+
+  geometry.attributes.normal.needsUpdate = true;
+}
+
+// Attach attributes FIRST
+geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+
+// IMPORTANT: ensure geometry renders before boot profile adjustment
+geometry.setDrawRange(0, MAX_PARTICLES);
+
+// Generate initial shape
+generateSphere();
+positions.set(targetPositions);
+
+// Now tell GPU
+geometry.attributes.position.needsUpdate = true;
+geometry.computeBoundingSphere();
+recomputeNormals();
+
+
+const spriteCanvas = document.createElement('canvas');
+spriteCanvas.width = spriteCanvas.height = 64;
+const ctx = spriteCanvas.getContext('2d');
+
+// ==================== PARTICLE SPRITE (UPGRADED) ====================
+// Goal:
+// - Dense dark core
+// - Sharp energy ring
+// - Soft asymmetric halo
+// - Cleaner zoom behavior
+
+const grad = ctx.createRadialGradient(32, 32, 4, 32, 32, 28);
+
+// Core: darker, denser
+grad.addColorStop(0.0, 'rgba(140,90,220,0.18)');
+grad.addColorStop(0.18, 'rgba(160,110,240,0.25)');
+
+// Energy ring: sharper presence
+grad.addColorStop(0.42, 'rgba(210,170,255,0.55)');
+grad.addColorStop(0.55, 'rgba(230,190,255,0.9)');
+
+// Halo falloff: faster, cleaner
+grad.addColorStop(0.75, 'rgba(180,130,255,0.25)');
+grad.addColorStop(1.0, 'rgba(255,255,255,0)');
+
+ctx.clearRect(0, 0, 64, 64);
+ctx.fillStyle = grad;
+ctx.fillRect(0, 0, 64, 64);
+
+
+const texture = new THREE.CanvasTexture(spriteCanvas);
+
+const material = new THREE.ShaderMaterial({
+
+  uniforms: {
+    uTexture: { value: texture },
+    uLightDir: { value: new THREE.Vector3(1, 0.6, 0.8).normalize() },
+    uMidColor: { value: new THREE.Color('#6a3cff') },
+    uHighlightColor: { value: new THREE.Color('#c9b6ff') },
+    uTime: { value: 0 },
+    uSize: { value: 2.0 },
+    uGlowBoost: { value: 1.0 }
+    
+  },
+
+  vertexShader: `
+    
+    uniform float uTime;
+    uniform float uSize;
+
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    void main() {
+
+      vNormal = normalize(normal);
+      vPosition = position;
+
+      vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+
+      gl_PointSize = uSize * (300.0 / -mvPosition.z);
+
+      gl_Position = projectionMatrix * mvPosition;
+    }
+
+  `,
+
+  fragmentShader: `
+    uniform sampler2D uTexture;
+    uniform vec3 uLightDir;
+    uniform vec3 uMidColor;
+    uniform vec3 uHighlightColor;
+    uniform float uGlowBoost;
+
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    void main() {
+
+      vec4 tex = texture2D(uTexture, gl_PointCoord);
+      if (tex.a < 0.1) discard;
+
+      float lightFactor = max(dot(normalize(vNormal), normalize(uLightDir)), 0.0);
+
+      float vertical = clamp((vPosition.y + 40.0) / 80.0, 0.0, 1.0);
+      float radial = clamp(1.0 - length(vPosition.xz) / 70.0, 0.0, 1.0);
+
+      vec3 color = mix(uMidColor, uHighlightColor, lightFactor);
+      color *= mix(0.6, 1.2, vertical * 0.6 + radial * 0.4);
+
+      float rim = pow(1.0 - lightFactor, 2.0) * 0.15;
+      color += rim;
+
+      float depthFade = smoothstep(150.0, 0.0, length(vPosition));
+      float coreBoost = smoothstep(40.0, 0.0, length(vPosition)) * 0.6;
+      color += coreBoost;
+      color *= depthFade;
+
+      gl_FragColor = vec4(color, tex.a * 0.55 * uGlowBoost);
+
+    }
+  `,
+
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.NormalBlending
+
+});
+
+window.__orbitalMaterial__ = material;
+window.__orbitalGeometry__ = geometry;
+window.__targetPositions__ = targetPositions;
+window.__effectiveParticleCount__ = effectiveParticleCount;
+
+// ===== SPEECH COLOR STATE (SAFE LAYER) =====
+let speechUserColor = new THREE.Color("#00ffaa");   // user = green
+let speechAiColor   = new THREE.Color("#00aaff");   // AI = blue
+
+let speechMidBase = material.uniforms.uMidColor.value.clone();
+let speechHighlightBase = material.uniforms.uHighlightColor.value.clone();
+
+
+
+texture.magFilter = THREE.NearestFilter;
+texture.generateMipmaps = false;
+
+
+function createLockRing() {
+  const segments = 64;
+  const radius = 75; // slightly larger than max shape
+
+  const points = [];
+  for (let i = 0; i <= segments; i++) {
+    const angle = (i / segments) * Math.PI * 2;
+    points.push(
+      new THREE.Vector3(
+        Math.cos(angle) * radius,
+        Math.sin(angle) * radius,
+        0
+      )
+    );
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+  lockRingMaterial = new THREE.LineBasicMaterial({
+    color: 0xf3d7a6,   // soft gold
+    transparent: true,
+    opacity: 0.0
+  });
+
+  lockRing = new THREE.Line(geometry, lockRingMaterial);
+  lockRing.rotation.x = Math.PI / 2; // face camera-ish
+  scene.add(lockRing);
+}
+
+
+const particles = new THREE.Points(geometry, material);
+scene.add(particles);
+
+createLockRing();
+
+// ==================== HAND TRACKING ====================
+const videoElement = document.getElementById('video');
+const skelCanvas = document.getElementById('skeleton');
+const handStatusEl = document.getElementById('handStatus');
+
+// ================= EDITOR CANVAS SETUP =================
+const editorCanvas = document.getElementById("shapeEditor");
+const editorCtx = editorCanvas.getContext("2d");
+
+function resizeEditor() {
+  editorCanvas.width = window.innerWidth;
+  editorCanvas.height = window.innerHeight;
+}
+
+resizeEditor();
+window.addEventListener("resize", resizeEditor);
+
+
+const skelCtx = skelCanvas.getContext('2d');
+
+let rawHandX = 0, rawHandY = 0, rawOpenness = 0, rawRoll = 0;
+let handX = 0, handY = 0, handOpenness = 0, handRoll = 0;
+let cameraStarted = false;
+
+//Edge brightness Globals
+
+const DARK_ON  = 0.26; // turn ON below this
+const DARK_OFF = 0.32; // turn OFF above this
+
+let lastAmbientSample = 0;
+
+const AMBIENT_SAMPLE_INTERVAL = 500;
+
+let lastHandSeen = performance.now();
+
+let calibrating = true;
+let calibStart = performance.now();
+let openMinDyn = Infinity;
+let openMaxDyn = -Infinity;
+
+const ROTATE_SMOOTH = 0.22;
+const OPEN_MIN_FALLBACK = 0.9;
+const OPEN_MAX_FALLBACK = 1.8;
+
+const HAND_CONNECTIONS = [
+  [0,1],[1,2],[2,3],[3,4],
+  [0,5],[5,6],[6,7],[7,8],
+  [0,9],[9,10],[10,11],[11,12],
+  [0,13],[13,14],[14,15],[15,16],
+  [0,17],[17,18],[18,19],[19,20]
+];
+
+const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
+hands.setOptions({
+  maxNumHands: 2,
+  modelComplexity: 1,
+  minDetectionConfidence: 0.7,
+  minTrackingConfidence: 0.7
+});
+
+function drawHand(lm) {
+  skelCtx.lineWidth = 2;
+  skelCtx.strokeStyle = calibrating ? '#888' : '#9b4dff';
+  skelCtx.fillStyle = '#cfa6ff';
+
+  const w = skelCanvas.width;
+  const h = skelCanvas.height;
+
+  for (const [a, b] of HAND_CONNECTIONS) {
+    skelCtx.beginPath();
+    skelCtx.moveTo((1 - lm[a].x) * w, lm[a].y * h);
+    skelCtx.lineTo((1 - lm[b].x) * w, lm[b].y * h);
+    skelCtx.stroke();
+  }
+
+  for (const p of lm) {
+    skelCtx.beginPath();
+    skelCtx.arc((1 - p.x) * w, p.y * h, 4, 0, Math.PI * 2);
+    skelCtx.fill();
+  }
+}
+
+
+function smoothLandmarks(rawLm) {
+  if (!smoothedLandmarks) {
+    // first frame → clone
+    smoothedLandmarks = rawLm.map(p => ({ ...p }));
+    return smoothedLandmarks;
+  }
+
+  for (let i = 0; i < rawLm.length; i++) {
+    smoothedLandmarks[i].x += (rawLm[i].x - smoothedLandmarks[i].x) * (1 - LANDMARK_SMOOTH);
+    smoothedLandmarks[i].y += (rawLm[i].y - smoothedLandmarks[i].y) * (1 - LANDMARK_SMOOTH);
+    smoothedLandmarks[i].z += (rawLm[i].z - smoothedLandmarks[i].z) * (1 - LANDMARK_SMOOTH);
+  }
+
+  return smoothedLandmarks;
+}
+
+function stabilizeTwoHands(rawHands) {
+  let [h1, h2] = rawHands;
+
+  // sort left → right using palm center
+  if (h1[9].x > h2[9].x) [h1, h2] = [h2, h1];
+
+  // init on first frame
+  if (!stableHands.left || !stableHands.right) {
+    stableHands.left  = h1.map(p => ({ ...p }));
+    stableHands.right = h2.map(p => ({ ...p }));
+    return [stableHands.left, stableHands.right];
+  }
+
+  // smooth landmarks
+  for (let i = 0; i < 21; i++) {
+    stableHands.left[i].x  += (h1[i].x - stableHands.left[i].x) * (1 - HAND_SMOOTH);
+    stableHands.left[i].y  += (h1[i].y - stableHands.left[i].y) * (1 - HAND_SMOOTH);
+    stableHands.left[i].z  += (h1[i].z - stableHands.left[i].z) * (1 - HAND_SMOOTH);
+
+    stableHands.right[i].x += (h2[i].x - stableHands.right[i].x) * (1 - HAND_SMOOTH);
+    stableHands.right[i].y += (h2[i].y - stableHands.right[i].y) * (1 - HAND_SMOOTH);
+    stableHands.right[i].z += (h2[i].z - stableHands.right[i].z) * (1 - HAND_SMOOTH);
+  }
+
+  return [stableHands.left, stableHands.right];
+}
+
+
+  const ambientCanvas = document.createElement('canvas');
+  ambientCanvas.width = 32;
+  ambientCanvas.height = 32;
+  const ambientCtx = ambientCanvas.getContext('2d');
+
+
+function sampleAmbientLight(video) {
+  if (!video.videoWidth || !video.videoHeight) return ambientLightLevel;
+
+  ambientCtx.drawImage(video, 0, 0, 32, 32);
+  const data = ambientCtx.getImageData(0, 0, 32, 32).data;
+
+  let sum = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    sum += 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+  }
+
+  return sum / ((data.length / 4) * 255);
+}
+
+
+
+hands.onResults((results) => {
+  
+
+  let targetOpacity = 0;
+  const now = performance.now();
+
+  // ===== AUDIO ENERGY =====
+  const { energy, bass } = getUserAudioEnergy();
+
+  let aiBoost = document.body.classList.contains("ai-speaking") ? 0.5 : 0;
+
+  const rawEnergy = energy + aiBoost;
+
+// Non-linear smoothing curve
+const totalEnergy = Math.pow(rawEnergy, 1.6);
+
+  // advance vibration phase
+  audioPulsePhase += 0.02 + totalEnergy * 0.15;
+
+
+  const statusEl = handStatusEl
+  skelCtx.clearRect(0, 0, skelCanvas.width, skelCanvas.height);
+
+  const handsArr = results.multiHandLandmarks || [];
+  const count = handsArr.length;
+  if (count > 0) {
+  lastHandSeenTime = performance.now();
+}
+
+
+
+  // ================= HAND STATUS PILL (GLOBAL & AUTHORITATIVE) =================
+
+let pillText = 'Hand not detected';
+
+// reset classes once (single source)
+statusEl.classList.remove('tracking', 'twohand', 'lost');
+
+// 1️⃣ Low light always wins
+if (edgeLightActive) {
+  pillText = 'Low light detected';
+  statusEl.classList.add('tracking');
+}
+
+// 2️⃣ Two hands (DO NOT depend on twoHandArmed for UI)
+else if (count === 2) {
+  pillText = 'Two-hand control';
+  statusEl.classList.add('tracking', 'twohand');
+}
+
+// 4️⃣ Single hand
+else if (count === 1) {
+  pillText = 'Hand tracking';
+  statusEl.classList.add('tracking');
+}
+
+// 5️⃣ No hands
+else {
+  pillText = 'Hand not detected';
+  statusEl.classList.add('lost');
+}
+
+statusEl.textContent = pillText;
+
+
+
+  // ===== AMBIENT LIGHT SAMPLING (ALWAYS ON) =====
+const nowTime = performance.now();
+
+if (cameraStarted && nowTime - lastAmbientSample > AMBIENT_SAMPLE_INTERVAL) {
+  const rawAmbient = sampleAmbientLight(videoElement);
+  smoothedAmbient += (rawAmbient - smoothedAmbient) * 0.2;
+  ambientLightLevel = smoothedAmbient;
+  lastAmbientSample = nowTime;
+}
+
+// ===== DARK STATE WITH HYSTERESIS =====
+// ===== DARK STATE WITH HYSTERESIS =====
+if (!darkState && ambientLightLevel < DARK_ON) {
+  darkState = true;
+
+  // 🔻 FORCE EDGE PROFILE IMMEDIATELY
+  if (window.__PARTICLE_PROFILES__) {
+    effectiveParticleCount = window.__PARTICLE_PROFILES__.EDGE;
+    geometry.setDrawRange(0, effectiveParticleCount);
+  }
+}
+else if (darkState && ambientLightLevel > DARK_OFF) {
+  darkState = false;
+
+  // 🔺 RESTORE FULL PROFILE IMMEDIATELY
+  if (window.__PARTICLE_PROFILES__) {
+    effectiveParticleCount = window.__PARTICLE_PROFILES__.FULL;
+    geometry.setDrawRange(0, effectiveParticleCount);
+  }
+}
+
+
+// ===== EDGE LIGHT FINAL RULE =====
+edgeLightActive = darkState;
+
+
+lastHandCount = count;
+
+if (edgeLightActive) {
+// ===== EDGE LIGHT (STABLE + HYSTERESIS) ====
+
+// --- OPACITY DECISION ---
+  targetOpacity = 1.0; // FULL, ALWAYS
+// apply only when meaningful change
+const currentOpacity = parseFloat(edgeLightEl.style.opacity || 0);
+
+if (!(currentOpacity === 0 && targetOpacity === 0)) {
+  smoothedEdgeOpacity += (targetOpacity - smoothedEdgeOpacity) * 0.25;
+
+  if (Math.abs(currentOpacity - smoothedEdgeOpacity) > 0.02) {
+    edgeLightEl.style.opacity = smoothedEdgeOpacity.toFixed(3);
+  }
+}
+} else {
+  // HARD SLEEP MODE
+  smoothedEdgeOpacity = 0;
+  targetOpacity = 0;
+  edgeLightEl.style.opacity = 0;
+}
+
+
+// ===== PERF MODE (V3.6) =====
+// Assist mode directly implies conservative performance
+edgeLightPerfMode = edgeLightActive;
+
+
+  /* ================= NO HANDS ================= */
+  if (count === 0) {
+
+    // 🔻 When hands lost → drop control link
+  controlLinkTarget = 0;
+  controlLinkActive = false;
+
+  // allow brief MediaPipe dropouts without resetting orientation
+  if (performance.now() - lastHandSeenTime < HAND_LOSS_GRACE_MS) {
+    return;
+  }
+
+  // true loss → reset everything
+  stableHands.left = null;
+  stableHands.right = null;
+  smoothTwoHandDist = null;
+  smoothedLandmarks = null;
+  dualStillActive = false;
+  
+
+  return;
+}
+
+
+  /* ================= COMMON RECOVERY ================= */
+
+  // ===== CONTROL LINK ACTIVATION =====
+if (!controlLinkActive) {
+  controlLinkActive = true;
+  controlLinkStart = performance.now();
+  controlLinkTarget = 1;
+
+  // Sync hand baseline to avoid impulse spike
+  lastHandX = handX;
+  lastHandY = handY;
+  lastHandRoll = handRoll;
+
+  rotVelX = 0;
+  rotVelY = 0;
+  rotVelZ = 0;
+}
+
+  statusEl.classList.remove('lost');
+  statusEl.classList.add('tracking');
+
+  /* ================= DRAW ================= */
+  if (count === 1 && smoothedLandmarks) {
+  drawHand(smoothedLandmarks);
+}
+else if (count === 2 && stableHands.left && stableHands.right) {
+  drawHand(stableHands.left);
+  drawHand(stableHands.right);
+}
+
+
+  /* ================= TWO HAND MODE ================= */
+if (count === 2) {
+  const [A, B] = stabilizeTwoHands(handsArr);
+
+  // ===== DRAW (STABLE TWO HANDS ONLY) =====
+  drawHand(A);
+  drawHand(B);
+
+  
+  // ================= DUAL STILLNESS DETECTION =================
+
+  if (
+  (currentMode === APP_MODE.VIEW || currentMode === APP_MODE.EDIT) &&
+
+  performance.now() > dualStillCooldownUntil &&
+  !isMorphing &&
+  !isLocked
+) {
+
+  function openness(lm) {
+    const palm = lm[0];
+    const tips = [lm[4], lm[8], lm[12], lm[16], lm[20]];
+    let spread = 0;
+    for (const t of tips)
+      spread += Math.hypot(t.x - palm.x, t.y - palm.y);
+    const hSize = Math.hypot(lm[9].x - palm.x, lm[9].y - palm.y) || 0.001;
+    return (spread / tips.length) / hSize;
+  }
+
+  const openA = openness(A);
+  const openB = openness(B);
+
+  const minOpen = calibrating ? OPEN_MIN_FALLBACK : openMinDyn;
+  const maxOpen = calibrating ? OPEN_MAX_FALLBACK : openMaxDyn;
+
+  const normA = THREE.MathUtils.clamp((openA - minOpen) / (maxOpen - minOpen), 0, 1);
+  const normB = THREE.MathUtils.clamp((openB - minOpen) / (maxOpen - minOpen), 0, 1);
+
+  const oneOpenOneClosed =
+    (normA > DUAL_OPEN_THRESHOLD && normB < DUAL_CLOSED_THRESHOLD) ||
+    (normB > DUAL_OPEN_THRESHOLD && normA < DUAL_CLOSED_THRESHOLD);
+
+  // movement check (very strict)
+  const moveA =
+    Math.abs(A[9].x - stableHands.left[9].x) +
+    Math.abs(A[9].y - stableHands.left[9].y);
+
+  const moveB =
+    Math.abs(B[9].x - stableHands.right[9].x) +
+    Math.abs(B[9].y - stableHands.right[9].y);
+
+  const veryStill =
+    moveA < DUAL_MOVE_THRESHOLD &&
+    moveB < DUAL_MOVE_THRESHOLD;
+
+  if (oneOpenOneClosed && veryStill) {
+
+    if (!dualStillActive) {
+      dualStillActive = true;
+      dualStillStart = performance.now();
+    }
+
+    if (performance.now() - dualStillStart > DUAL_HOLD_TIME) {
+
+  dualStillCooldownUntil = performance.now() + 1500;
+  dualStillActive = false;
+
+  customMorphBoost = 1.4;
+  particles.scale.multiplyScalar(0.93);
+
+  if (currentMode === APP_MODE.VIEW) {
+  enterEditMode();
+} else {
+  customShapeActive = false;
+  regenerateCurrentProceduralShape();
+  exitEditMode(true);
+}
+
+  return;
+}
+
+
+  } else {
+    dualStillActive = false;
+  }
+}
+
+
+
+  // --- ARM / debounce logic (unchanged behavior) ---
+  if (!twoHandArmed) {
+    if (twoHandStartTime === 0) twoHandStartTime = now;
+    if (now - twoHandStartTime < TWO_HAND_ARM_DELAY) {
+      lastTwoHandDistance = null;
+      return;
+    }
+    twoHandArmed = true;
+    gestureAccum = 0;
+    lastTwoHandDistance = null;
+    twoHandCooldown = false;
+
+    statusEl.classList.add('twohand');
+    skelCanvas.classList.add('twohand');
+    return;
+  }
+
+  // --- compute per-hand openness (same method used in single-hand) ---
+  function handOpennessFromLM(lm) {
+    const palm = lm[0];
+    const tips = [lm[4], lm[8], lm[12], lm[16], lm[20]];
+    let spread = 0;
+    for (const t of tips) spread += Math.hypot(t.x - palm.x, t.y - palm.y);
+    const hSize = Math.hypot(lm[9].x - palm.x, lm[9].y - palm.y) || 0.001;
+    return (spread / tips.length) / hSize;
+  }
+
+  const opennessA = handOpennessFromLM(A);
+  const opennessB = handOpennessFromLM(B);
+
+  // --- normalize using the same calibration as single-hand ---
+  const minOpen = calibrating ? OPEN_MIN_FALLBACK : openMinDyn;
+  const maxOpen = calibrating ? OPEN_MAX_FALLBACK : openMaxDyn;
+  const normA = THREE.MathUtils.clamp((opennessA - minOpen) / (maxOpen - minOpen), 0, 1);
+  const normB = THREE.MathUtils.clamp((opennessB - minOpen) / (maxOpen - minOpen), 0, 1);
+
+  // --- require both hands to be similarly open OR similarly closed ---
+  const SIMILARITY_THRESHOLD = 0.25; // how close the normalized openness must be
+  const OPEN_THRESHOLD = 0.6;       // considered "open"
+  const CLOSED_THRESHOLD = 0.4;     // considered "closed"
+
+  const bothOpen = (normA > OPEN_THRESHOLD && normB > OPEN_THRESHOLD && Math.abs(normA - normB) < SIMILARITY_THRESHOLD);
+  const bothClosed = (normA < CLOSED_THRESHOLD && normB < CLOSED_THRESHOLD && Math.abs(normA - normB) < SIMILARITY_THRESHOLD);
+
+  // --- distance smoothing (same as before) ---
+  const pA = A[9];
+  const pB = B[9];
+  const rawDist = Math.hypot(pA.x - pB.x, pA.y - pB.y);
+
+  if (smoothTwoHandDist === null) {
+    smoothTwoHandDist = rawDist;
+  } else {
+    smoothTwoHandDist += (rawDist - smoothTwoHandDist) * 0.4;
+  }
+
+  const dist = smoothTwoHandDist;
+
+  if (lastTwoHandDistance === null) {
+    lastTwoHandDistance = dist;
+    return;
+  }
+
+  // --- If hands are not similarly open/closed, do NOT accumulate a shape gesture.
+  //     Instead gently decay any existing accumulation so stray motion won't trigger a switch.
+  if (!(bothOpen || bothClosed)) {
+    // gentle decay so recovering to matched state is clean
+    gestureAccum *= 0.92;
+    lastTwoHandDistance = dist;
+    return;
+  }
+
+  // --- Process distance delta into gesture accumulation (like before) ---
+
+    // ---------- OPENNESS-DRIVEN GESTURE (SOFT & SLOW FRIENDLY) ----------
+
+// average normalized openness
+const avgOpen = (normA + normB) * 0.5;
+
+// init openness memory
+if (lastTwoHandOpenness === null) {
+  lastTwoHandOpenness = avgOpen;
+  lastTwoHandDistance = dist;
+  return;
+}
+
+
+// openness delta (slow motion friendly)
+let openDelta = avgOpen - lastTwoHandOpenness;
+
+// smooth it heavily (CRITICAL)
+smoothOpennessDelta += (openDelta - smoothOpennessDelta) * 0.18;
+smoothOpennessDelta *= 0.9;
+
+// distance delta used ONLY as confirmation
+const distDelta = dist - lastTwoHandDistance;
+
+// require both palms moving together
+const CLOSE_EPS = 0.020;  // keep closing sensitive
+const OPEN_EPS  = 0.028;  // opening needs clearer intent
+const palmsClosing = (openDelta < -CLOSE_EPS) && bothClosed;
+const palmsOpening = (openDelta >  OPEN_EPS)  && bothOpen;
+
+
+
+// ---------- TEMPORAL INTENT FILTER (CORRECTED) ----------
+
+const INTENT_HOLD_TIME = 60; // ms (slightly lower = responsive)
+
+if (palmsClosing) {
+  if (closingIntentStart === null) closingIntentStart = now;
+  openingIntentStart = null;
+}
+else if (palmsOpening) {
+  if (openingIntentStart === null) openingIntentStart = now;
+  closingIntentStart = null;
+}
+else {
+  closingIntentStart = null;
+  openingIntentStart = null;
+}
+
+
+// ---------- ACCUMULATION ONLY AFTER STABLE INTENT ----------=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--==-
+if (!twoHandCooldown && !dualStillActive) {
+
+  // -------- FORWARD (PALMS CLOSING) --------
+  if (
+  closingIntentStart !== null &&
+  now - closingIntentStart > INTENT_HOLD_TIME &&
+  distDelta < 0.004
+) {
+    gestureAccum += Math.abs(smoothOpennessDelta) * 1.15;
+  }
+
+  // -------- BACKWARD (PALMS OPENING) --------
+  if (
+  openingIntentStart !== null &&
+  now - openingIntentStart > INTENT_HOLD_TIME &&
+  distDelta > -0.0035
+) {
+    gestureAccum -= Math.abs(smoothOpennessDelta) * 0.65;
+  }
+
+  // -------- ULTRA-SLOW DECAY --------
+  gestureAccum *= 0.992;
+
+  gestureAccum = THREE.MathUtils.clamp(
+    gestureAccum,
+    -0.35,
+    0.35
+  );
+
+  if (gestureAccum > GESTURE_THRESHOLD) {
+    switchShape(1);
+    gestureAccum = 0;
+    lastTwoHandDistance = null;
+    lastTwoHandOpenness = null;
+    closingIntentStart = null;
+    openingIntentStart = null;
+
+    return;
+  }
+
+  if (gestureAccum < -GESTURE_THRESHOLD) {
+    switchShape(-1);
+    gestureAccum = 0;
+    lastTwoHandDistance = null;
+    lastTwoHandOpenness = null;
+    closingIntentStart = null;
+    openingIntentStart = null;
+
+    return;
+  }
+}
+
+
+  if (twoHandCooldown && now - lastShapeSwitchTime > SHAPE_SWITCH_COOLDOWN_MS) {
+    twoHandCooldown = false;
+  }
+
+  lastTwoHandDistance = dist;
+  return;
+}
+
+
+  /* ================= SINGLE HAND MODE ================= */
+  // 🔒 HARD EXIT from two-hand state
+  twoHandArmed = false;
+  twoHandStartTime = 0;
+  lastTwoHandDistance = null;
+  lastTwoHandOpenness = null;
+  gestureAccum = 0;
+  twoHandCooldown = false;
+  smoothTwoHandDist = null;
+  closingIntentStart = null;
+  openingIntentStart = null;
+
+
+  statusEl.classList.remove('twohand');
+  skelCanvas.classList.remove('twohand');
+
+  const lm = smoothLandmarks(handsArr[0]);
+  // ===== DRAW (STABLE SINGLE HAND ONLY) =====
+  drawHand(lm);
+
+  stableHands.left = null;
+  stableHands.right = null; 
+
+
+  const xNorm = (0.5 - lm[9].x) * 2;
+  rawHandX = THREE.MathUtils.clamp(-xNorm, -0.85, 1.0);
+  rawHandY = (0.5 - lm[9].y) * 2;
+
+  const idx = lm[8];
+  rawRoll = Math.atan2(idx.y - lm[9].y, idx.x - lm[9].x);
+
+  const palm = lm[0];
+  const tips = [lm[4], lm[8], lm[12], lm[16], lm[20]];
+  let spread = 0;
+  for (const t of tips) spread += Math.hypot(t.x - palm.x, t.y - palm.y);
+
+  handSize = Math.hypot(lm[9].x - palm.x, lm[9].y - palm.y);
+  if (baseHandSize === null) baseHandSize = handSize;
+
+  rawOpenness = (spread / tips.length) / Math.max(handSize, 0.001);
+  rawDepth = lm[9].z;
+
+});
+
+
+let lastHandProcess = 0;
+const HAND_FPS = 40; // protected perception rate
+
+const mpCamera = new Camera(videoElement, {
+  onFrame: async () => {
+  // 🔒 HARD GATE: do nothing until experience starts
+  if (!experienceStarted) return;
+
+  const now = performance.now();
+  // ===== CONTROL LINK FADE =====
+if (controlLinkActive) {
+  const elapsed = now - controlLinkStart;
+  controlLink = Math.min(1, elapsed / CONTROL_FADE_DURATION);
+} else {
+  controlLink += (0 - controlLink) * 0.08;
+}
+
+  if (now - lastHandProcess < 1000 / HAND_FPS) return;
+  lastHandProcess = now;
+
+  if (!videoElement.videoWidth) return;
+
+  await hands.send({ image: videoElement });
+},
+
+  width: 640,
+  height: 480
+});
+
+
+async function startCamera() {
+  if (cameraStarted) return;
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  videoElement.srcObject = stream;
+  await mpCamera.start();
+  cameraStarted = true;
+}
+
+// ================= EDIT MODE CONTROL =================
+
+function enterEditMode() {
+  previousShapeBeforeEdit = currentShapeIndex;
+  currentMode = APP_MODE.EDIT;
+  document.body.classList.add("edit-mode");
+
+  savedParticleSize = particles.material.uniforms.uSize.value;
+  particles.material.uniforms.uSize.value = savedParticleSize * 0.7;
+
+  particles.scale.setScalar(particles.scale.x * 0.94);
+  particles.rotation.x *= 0.85;
+  particles.rotation.y *= 0.85;
+
+  editorCanvas.style.opacity = "1";
+  editorCanvas.style.pointerEvents = "auto";
+
+  handStatusEl.textContent = "Edit Mode (Press ESC to exit)";
+
+  if (typeof updateUserPanel === "function") {
+  updateUserPanel();
+}
+
+}
+
+
+function exitEditMode(revert = true) {
+
+  currentMode = APP_MODE.VIEW;
+  document.body.classList.remove("edit-mode");
+
+  customShapeActive = false;
+
+  editorCanvas.style.opacity = "0";
+  editorCanvas.style.pointerEvents = "none";
+
+  if (savedParticleSize !== null) {
+    particles.material.uniforms.uSize.value = savedParticleSize;
+  }
+
+  editorCtx.clearRect(0, 0, editorCanvas.width, editorCanvas.height);
+  currentPath = [];
+
+  if (revert && previousShapeBeforeEdit !== null) {
+
+    currentShapeIndex = previousShapeBeforeEdit;
+
+    const shape = SHAPES[currentShapeIndex];
+
+    if (shape === 'sphere') generateSphere();
+    if (shape === 'infinity') generateInfinity();
+    if (shape === 'heart') generateHeart();
+    if (shape === 'saturn') generateSaturn();
+    if (shape === 'spiral') generateSpiral();
+    if (shape === 'butterfly') generateButterfly();
+
+    isMorphing = true;
+    normalsDirty = true;
+    customShapeActive = false;
+
+    // Tell musicMode to refresh its savedShape to the new targetPositions.
+    // Without this, musicMode keeps blending tp toward the drawn shape coords
+    // and the revert morph never reaches the original shape.
+    if (window.musicModeOnShapeSwitch) {
+      window.musicModeOnShapeSwitch();
+    } else if (window.__targetPositions__ && window.musicModeActive) {
+      // Fallback: directly update savedShape reference
+      const tp = window.__targetPositions__;
+      const cnt = window.__PARTICLE_PROFILES__?.FULL || 20000;
+      if (window._mmSavedShapeRef) {
+        window._mmSavedShapeRef.set(tp.slice(0, cnt * 3));
+      }
+    }
+  }
+
+  updateUserPanel();
+}
+
+
+
+// ================= BASIC DRAW SYSTEM =================
+
+let drawing = false;
+let currentPath = [];
+
+editorCanvas.addEventListener("pointerdown", (e) => {
+  if (currentMode !== APP_MODE.EDIT) return;
+
+  editorCanvas.setPointerCapture(e.pointerId);
+
+  drawing = true;
+  currentPath = [];
+});
+
+editorCanvas.addEventListener("pointermove", (e) => {
+  if (!drawing) return;
+
+  currentPath.push({
+    x: e.clientX,
+    y: e.clientY
+  });
+
+  drawEditor();
+});
+
+editorCanvas.addEventListener("pointerup", (e) => {
+  drawing = false;
+  editorCanvas.releasePointerCapture(e.pointerId);
+});
+
+
+// ADD THIS EXACTLY BELOW pointerup
+editorCanvas.addEventListener("pointerleave", () => {
+  drawing = false;
+});
+
+
+editorCanvas.addEventListener("dblclick", () => {
+  currentPath = [];
+  drawEditor();
+});
+
+
+function drawEditor() {
+  editorCtx.clearRect(0, 0, editorCanvas.width, editorCanvas.height);
+
+  // subtle dark overlay
+  editorCtx.fillStyle = "rgba(0,0,0,0.25)";
+  editorCtx.fillRect(0, 0, editorCanvas.width, editorCanvas.height);
+
+  editorCtx.strokeStyle = "#9b4dff";
+  editorCtx.lineWidth = 2;
+
+  editorCtx.beginPath();
+
+  for (let i = 0; i < currentPath.length; i++) {
+    const p = currentPath[i];
+    if (i === 0) editorCtx.moveTo(p.x, p.y);
+    else editorCtx.lineTo(p.x, p.y);
+  }
+
+  editorCtx.stroke();
+}
+
+
+// ================= PATH → PARTICLE CONVERSION =================
+
+function generateShapeFromPath() {
+
+  // 1️⃣ Compute bounding box
+  let minX = Infinity, minY = Infinity;
+  let maxX = -Infinity, maxY = -Infinity;
+
+  for (const p of currentPath) {
+    if (p.x < minX) minX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y > maxY) maxY = p.y;
+  }
+
+  const width = maxX - minX;
+  const height = maxY - minY;
+  const size = Math.max(width, height);
+
+  if (size < 10) return;
+
+  // 2️⃣ Normalize and center
+  // ----- CENTER + CONSISTENT SCALE -----
+
+const DRAW_WORLD_SIZE = 90; // slightly larger than before
+
+// Compute true center
+const centerX = (minX + maxX) * 0.5;
+const centerY = (minY + maxY) * 0.5;
+
+// Normalize relative to center
+const normalized = currentPath.map(p => {
+
+  const nx = (p.x - centerX) / size;
+  const ny = (p.y - centerY) / size;
+
+  return {
+    x: nx * DRAW_WORLD_SIZE,
+    y: -ny * DRAW_WORLD_SIZE
+  };
+});
+
+
+  // 3️⃣ Distribute particles along path (outline mode)
+  
+  // 3️⃣ Compute cumulative arc length
+const segments = [];
+let totalLength = 0;
+
+for (let i = 1; i < normalized.length; i++) {
+  const dx = normalized[i].x - normalized[i - 1].x;
+  const dy = normalized[i].y - normalized[i - 1].y;
+  const len = Math.hypot(dx, dy);
+
+  segments.push({
+    start: normalized[i - 1],
+    end: normalized[i],
+    length: len
+  });
+
+  totalLength += len;
+}
+
+if (totalLength === 0) return;
+
+const count = Math.floor(effectiveParticleCount * 0.85);
+
+let distStep = totalLength / count;
+
+let currentSeg = 0;
+let accumulated = 0;
+let segAccum = segments[0].length;
+
+for (let i = 0; i < count; i++) {
+
+  const targetDist = i * distStep;
+
+  while (targetDist > segAccum && currentSeg < segments.length - 1) {
+    accumulated = segAccum;
+    currentSeg++;
+    segAccum += segments[currentSeg].length;
+  }
+
+  const seg = segments[currentSeg];
+  const localDist = targetDist - accumulated;
+  const t = seg.length > 0 ? localDist / seg.length : 0;
+
+  const x = seg.start.x + (seg.end.x - seg.start.x) * t;
+  const y = seg.start.y + (seg.end.y - seg.start.y) * t;
+
+  targetPositions[i * 3]     = x;
+  targetPositions[i * 3 + 1] = y;
+  // ----- 3D DEPTH VOLUME -----
+
+const radial = Math.hypot(x, y) / DRAW_WORLD_SIZE;
+
+// more depth near center, less near edges
+const depthSpread = THREE.MathUtils.lerp(28, 8, radial);
+
+targetPositions[i * 3 + 2] =
+  (Math.random() - 0.5) * depthSpread;
+
+}
+
+
+  // Fill remaining target positions (beyond the drawn count) with zero
+  // so the morph loop completes cleanly and isMorphing goes false.
+  for (let i = count; i < effectiveParticleCount; i++) {
+    targetPositions[i * 3]     = 0;
+    targetPositions[i * 3 + 1] = 0;
+    targetPositions[i * 3 + 2] = 0;
+  }
+
+  isMorphing = true;
+  normalsDirty = true;
+  customShapeActive = true;   // 🔒 prevent saturn/galaxy overrides
+  customMorphBoost = 1.25;
+  // Clear drawing overlay but stay in edit mode
+editorCtx.clearRect(0, 0, editorCanvas.width, editorCanvas.height);
+currentPath = [];
+
+}
+
+
+// ==================== ANIMATION ====================
+// NOTE: We also update particle colors here to simulate
+// light coming from ONE SIDE (fake directional lighting)
+let targetScale = 1;
+
+let animationRunning = false;
+let visualsReady = false; // ⬅ blocks first frames
+
+function applyVibe(vibe) {
+
+  if (vibe === "calm") {
+    vibeSettings.morphSpeed = 0.85;
+    vibeSettings.motionDamp = 1.15;
+    vibeSettings.glowBoost = 0.9;
+    vibeSettings.colorShift = 0;
+    vibeSettings.breatheSpeed = 0.6;
+    vibeSettings.depthSoftness = 1.2;
+  }
+
+  else if (vibe === "focused") {
+    vibeSettings.morphSpeed = 1.0;
+    vibeSettings.motionDamp = 1.3;
+    vibeSettings.glowBoost = 0.8;
+    vibeSettings.colorShift = 0;
+    vibeSettings.breatheSpeed = 0.4;
+    vibeSettings.depthSoftness = 0.8;
+  }
+
+  else if (vibe === "energetic") {
+    vibeSettings.morphSpeed = 1.3;
+    vibeSettings.motionDamp = 0.85;
+    vibeSettings.glowBoost = 1.35;
+    vibeSettings.colorShift = 0;
+    vibeSettings.breatheSpeed = 1.8;
+    vibeSettings.depthSoftness = 0.9;
+  }
+
+  else if (vibe === "mystic") {
+    vibeSettings.morphSpeed = 0.95;
+    vibeSettings.motionDamp = 0.95;
+    vibeSettings.glowBoost = 1.2;
+    vibeSettings.colorShift = 1;
+    vibeSettings.breatheSpeed = 1.0;
+    vibeSettings.depthSoftness = 1.1;
+  }
+
+  // === APPLY VIBE COLOR TO PARTICLES ===
+const [baseHex, highlightHex] = VIBE_COLORS[vibe];
+
+const baseColor = new THREE.Color(baseHex);
+const highlightColor = new THREE.Color(highlightHex);
+
+material.uniforms.uMidColor.value.copy(baseColor);
+material.uniforms.uHighlightColor.value.copy(highlightColor);
+
+}
+
+// ── Expose shape/vibe controls globally for orbitalVoice.js cross-module access ──
+window.switchShape = switchShape;
+window.applyVibe   = applyVibe;
+
+
+function animate() {
+  if (currentTier === SIMULATION_TIER.IDLE && lastHandCount === 0) {
+  if (galaxyTick++ % 3 !== 0) {
+    requestAnimationFrame(animate);
+    return;
+  }
+}
+
+  if (!experienceStarted || !visualsReady) {
+  requestAnimationFrame(animate);
+  return;
+}
+
+
+  // EDIT mode: only early-return when canvas is blank (no shape yet)
+  // Once a shape is drawn (customShapeActive=true), run the full loop
+  // so hand gestures can rotate/scale the drawn shape normally.
+  if (currentMode === APP_MODE.EDIT && !isMorphing && !customShapeActive) {
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+  return;
+}
+
+
+  const now = performance.now();
+  // Expose draw-mode state so musicMode.js can read it
+  window.isMorphing       = isMorphing;
+  window.customShapeActive = customShapeActive;
+  material.uniforms.uTime.value = now * 0.001;
+  material.uniforms.uGlowBoost.value = vibeSettings.glowBoost;
+
+  if (vibeSettings.colorShift && SHAPES[currentShapeIndex] !== 'spiral') {
+  const t = now * 0.00025;
+  const hueShift = Math.sin(t) * 0.08;
+
+  const base = SHAPE_COLORS[SHAPES[currentShapeIndex]].mid.clone();
+  base.offsetHSL(hueShift, 0, 0);
+
+  material.uniforms.uMidColor.value.copy(base);
+}
+
+
+  const dt = now - lastFrameTime;
+  lastFrameTime = now;
+
+  //Dev Ops
+  fpsFrames++;
+
+if (now - fpsLastTime >= 1000) {
+  fps = fpsFrames;
+  fpsFrames = 0;
+  fpsLastTime = now;
+}
+
+
+  updatePerfLevel(dt);
+  updateSimulationTier();
+
+  // ===== PARTICLE PROFILE SWITCH (EDGE LIGHT) =====
+if (window.__PARTICLE_PROFILES__) {
+  let desired;
+
+  if (devMode && devForceProfile) {
+    desired = window.__PARTICLE_PROFILES__[devForceProfile];
+  } else {
+    desired = edgeLightActive
+      ? window.__PARTICLE_PROFILES__.EDGE
+      : window.__PARTICLE_PROFILES__.FULL;
+  }
+
+if (!isMorphing && effectiveParticleCount !== desired) {
+  effectiveParticleCount = desired;
+  geometry.setDrawRange(0, effectiveParticleCount);
+  window.__effectiveParticleCount__ = effectiveParticleCount;
+}
+
+}
+
+
+if (devMode && now - lastGraphUpdate > GRAPH_UPDATE_INTERVAL) {
+  lastGraphUpdate = now;
+
+  // smooth fps before pushing
+  const smoothFPS = fpsHistory[fpsHistory.length - 1] * 0.7 + fps * 0.3;
+  fpsHistory.push(smoothFPS);
+  fpsHistory.shift();
+
+  // draw graph
+  graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+
+  graphCtx.beginPath();
+  fpsHistory.forEach((v, i) => {
+    const x = (i / (GRAPH_POINTS - 1)) * graphCanvas.width;
+    const y = graphCanvas.height - (v / 60) * graphCanvas.height;
+    if (i === 0) graphCtx.moveTo(x, y);
+    else graphCtx.lineTo(x, y);
+  });
+
+  graphCtx.strokeStyle = '#9b4dff';
+  graphCtx.lineWidth = 2;
+  graphCtx.stroke();
+}
+
+
+// ---------- PER-SHAPE MATERIAL CONTROL ----------
+const densityFactor = Math.sqrt(24000 / effectiveParticleCount);
+material.uniforms.uSize.value = shapeTextureBias.size * 1.6 * densityFactor;
+
+
+// default: physical
+material.blending  = THREE.NormalBlending;
+material.alphaTest = 0.18;
+
+// cinematic exceptions
+if (SHAPES[currentShapeIndex] === 'saturn') {
+  material.blending  = THREE.AdditiveBlending;
+  material.alphaTest = 0.05;
+}
+
+  // ---- Spiral glow mode ----
+if (SHAPES[currentShapeIndex] === 'spiral') {
+  material.blending  = THREE.AdditiveBlending;
+  material.alphaTest = 0.08;
+
+  material.uniforms.uGlowBoost.value =
+  vibeSettings.glowBoost * 0.65;
+  // reduce burn
+}
+
+
+
+// ===== UI PULSE BASED ON MOTION =====
+const uiPulse =
+  Math.min(
+    1,
+    Math.abs(handX) +
+    Math.abs(handY) +
+    Math.abs(handOpenness)
+  );
+
+const _newTransform = `translateX(-50%) scale(${(1 + uiPulse * 0.08).toFixed(4)})`;
+if (handStatusEl._lastTransform !== _newTransform) {
+  handStatusEl.style.transform = _newTransform;
+  handStatusEl._lastTransform = _newTransform;
+}
+
+
+  // ---------- LOCK RING VISUAL ----------
+if (lockRing) {
+  // follow object
+  lockRing.position.copy(particles.position);
+  lockRing.rotation.y = particles.rotation.y;
+
+  // fade ring in/out
+  lockRingMaterial.opacity = lockProgress > 0
+    ? THREE.MathUtils.lerp(lockRingMaterial.opacity, 0.85, 0.15)
+    : THREE.MathUtils.lerp(lockRingMaterial.opacity, 0.0, 0.2);
+
+  // show progress by scaling Y
+  lockRing.scale.y = THREE.MathUtils.lerp(
+    0.001,
+    1.0,
+    lockProgress
+  );
+
+  // subtle pulse when fully locked
+  if (isLocked) {
+    const pulse = 1 + Math.sin(performance.now() * 0.004) * 0.03;
+    lockRing.scale.set(pulse, pulse, pulse);
+  }
+}
+
+
+  handX += (rawHandX - handX) * ROTATE_SMOOTH;
+  handY += (rawHandY - handY) * ROTATE_SMOOTH;
+  handOpenness += (rawOpenness - handOpenness) * 0.16;
+  handRoll += (rawRoll - handRoll) * 0.15;
+  handDepth += (rawDepth - handDepth) * 0.1;
+
+
+  // === Tuned 360° rotation (controlled but full range) ===
+const ROTATION_GAIN = Math.PI * 1.2;   // reduce intensity
+
+const targetX = -handY * ROTATION_GAIN;
+const targetY = -handX * ROTATION_GAIN;
+const targetZ = handRoll * (ROTATION_GAIN * 0.6);
+
+
+  const minOpen = calibrating ? OPEN_MIN_FALLBACK : openMinDyn;
+  const maxOpen = calibrating ? OPEN_MAX_FALLBACK : openMaxDyn;
+  const opennessNorm = THREE.MathUtils.clamp((handOpenness - minOpen) / (maxOpen - minOpen), 0, 1);
+
+  // ===== INTENT-BASED SCALE (RELATIVE, NOT ABSOLUTE) =====
+  const intent = THREE.MathUtils.smoothstep(
+    opennessNorm,
+    0.15, // ignore noise
+    0.75  // full intent
+  );
+
+  const gestureScale = THREE.MathUtils.lerp(
+    0.6,  // strong shrink
+    1.0,  // normal
+    intent
+  );
+
+  const finalScale = BASE_SCALE * gestureScale;
+
+if (!isLocked) {
+
+  // ROTATION
+  const fade = 1.0;
+
+// 👉 NORMAL SHAPES ROTATE DIRECTLY
+const rotSpeed =
+  SHAPES[currentShapeIndex] === 'saturn'
+    ? 0.38   // faster, more physical
+    : 0.22;  // default cinematic
+
+  // ===== HYBRID FOLLOW + IMPULSE =====
+
+  let handSpeed =
+    Math.abs(handX - lastHandX) +
+    Math.abs(handY - lastHandY) +
+    Math.abs(handRoll - lastHandRoll);
+
+
+    // ===== CLEAN SPEED MEASUREMENT =====
+if (handSpeed < DEAD_ZONE) handSpeed = 0;
+
+const acceleration = handSpeed - prevHandSpeed;
+
+// cooldown timer
+if (impulseCooldown) {
+  impulseTimer -= 16; // approx frame time
+  if (impulseTimer <= 0) {
+    impulseCooldown = false;
+  }
+}
+
+// ===== IMPULSE TRIGGER =====
+if (
+  controlLink > 0.6 &&
+  !impulseCooldown &&
+  acceleration > ACCEL_THRESHOLD
+) {
+
+  // strength depends on BOTH acceleration and sustained speed
+  const strength =
+    acceleration * 3 +
+    handSpeed * 1.5;
+
+  rotVelX += (targetX - particles.rotation.x) * strength;
+  rotVelY += (targetY - particles.rotation.y) * strength;
+  rotVelZ += (targetZ - particles.rotation.z) * strength * 0.6;
+
+  impulseCooldown = true;
+  impulseTimer = IMPULSE_COOLDOWN_MS;
+}
+
+
+    // normal precision follow
+    particles.rotation.x += (targetX - particles.rotation.x) * FOLLOW_STRENGTH * rotSpeed * controlLink;
+    particles.rotation.y += (targetY - particles.rotation.y) * FOLLOW_STRENGTH * rotSpeed * controlLink;
+    particles.rotation.z += (targetZ - particles.rotation.z) * FOLLOW_STRENGTH * rotSpeed * 0.7 * controlLink;
+
+    // controlled braking
+    rotVelX *= (1 - BRAKE_POWER);
+    rotVelY *= (1 - BRAKE_POWER);
+    rotVelZ *= (1 - BRAKE_POWER);
+
+  // apply inertia
+  particles.rotation.x += rotVelX * controlLink;
+  particles.rotation.y += rotVelY * controlLink;
+  particles.rotation.z += rotVelZ * controlLink;
+
+  // ===== CLAMP VELOCITY =====
+  rotVelX = Math.max(-MAX_ROT_VEL, Math.min(MAX_ROT_VEL, rotVelX));
+  rotVelY = Math.max(-MAX_ROT_VEL, Math.min(MAX_ROT_VEL, rotVelY));
+  rotVelZ = Math.max(-MAX_ROT_VEL, Math.min(MAX_ROT_VEL, rotVelZ));
+
+  // friction decay
+  rotVelX *= INERTIA_FRICTION;
+  rotVelY *= INERTIA_FRICTION;
+  rotVelZ *= INERTIA_FRICTION;
+
+  lastHandX = handX;
+  lastHandY = handY;
+  lastHandRoll = handRoll;
+  prevHandSpeed = handSpeed;
+
+
+const breathe =
+  1 +
+  Math.sin(now * 0.001 * vibeSettings.breatheSpeed) * 0.02;
+
+const scaledTarget = finalScale * breathe;
+
+particles.scale.setScalar(
+  particles.scale.x +
+  (scaledTarget - particles.scale.x) * 0.14 * fade
+);
+
+
+  // REAL DEPTH (camera z)
+  depthFactor = THREE.MathUtils.clamp(
+  handDepth * -420 / vibeSettings.depthSoftness,
+  -80,
+  60
+  );
+
+
+} else {
+  // 🔒 HARD FREEZE
+  particles.rotation.set(frozenRotX, frozenRotY, frozenRotZ);
+  particles.scale.setScalar(frozenScale);
+  depthFactor = frozenDepth;
+}
+
+particles.position.z += (depthFactor - particles.position.z) * 0.22;
+
+  const rotDelta =
+  Math.abs(particles.rotation.x - lastRotX) +
+  Math.abs(particles.rotation.y - lastRotY) +
+  Math.abs(particles.rotation.z - lastRotZ);
+
+  const handStill =
+  Math.abs(rawHandX - handX) < 0.002 &&
+  Math.abs(rawHandY - handY) < 0.002 &&
+  Math.abs(rawOpenness - handOpenness) < 0.003;
+
+
+if (isMorphing) {
+
+  let done = true;
+
+  const ease = 0.14 * customMorphBoost * vibeSettings.morphSpeed;
+  customMorphBoost = 1;
+
+  const morphLimit = effectiveParticleCount * 3;
+
+  for (let i = 0; i < morphLimit; i++) {
+
+    const delta = targetPositions[i] - positions[i];
+
+    positions[i] += delta * ease;
+
+    if (Math.abs(delta) > MORPH_EPSILON) {
+      done = false;
+    }
+  }
+
+  geometry.attributes.position.needsUpdate = true;
+
+  if (done) {
+  positions.set(targetPositions);
+  geometry.attributes.position.needsUpdate = true;
+  geometry.computeBoundingSphere();
+
+  if (SHAPES[currentShapeIndex] !== 'spiral') {
+    recomputeNormals();
+  }
+
+  isMorphing = false;
+}
+}
+
+
+ // ---- Cinematic Spiral Animation ----
+if (!window._spiralFrame) window._spiralFrame = 0;
+window._spiralFrame++;
+if (SHAPES[currentShapeIndex] === 'spiral' && !isMorphing && spiralBase && (perfLevel >= 1.0 || window._spiralFrame % 2 === 0)) {
+
+  const pos = geometry.attributes.position.array;
+  const norm = geometry.attributes.normal.array;
+
+
+  const baseSpeed =
+    perfLevel === 1.0 ? 0.00025 :
+    perfLevel === 0.7 ? 0.00015 :
+                        0.00008;
+
+  spiralPhase += baseSpeed;
+  spiralCorePhase += baseSpeed * 2.2; // core spins faster
+
+  const time = now * 0.00035;
+
+  for (let i = 0; i < effectiveParticleCount; i++) {
+
+    const bx = spiralBase[i * 3];
+    const by = spiralBase[i * 3 + 1];
+    const bz = spiralBase[i * 3 + 2];
+
+    const r = Math.hypot(bx, bz);
+    const baseAngle = Math.atan2(bz, bx);
+
+    const radialNorm = Math.min(r / 110, 1.0);
+
+    // ---- differential rotation ----
+    const swirl =
+      r < 25
+        ? spiralCorePhase
+        : spiralPhase * (0.4 + (1.0 - radialNorm) * 0.9);
+
+    // ---- gravitational inward pull illusion ----
+    const gravity =
+      1.0 - radialNorm * 0.15;
+
+    // ---- subtle arm ripple ----
+    const ripple =
+      Math.sin(time * 1.8 + baseAngle * 6.0 + r * 0.05) * 0.018;
+
+    const angle = baseAngle + swirl + ripple;
+
+    const breathe = 1.0 + Math.sin(time + r * 0.05) * 0.01;
+
+    pos[i * 3]     = Math.cos(angle) * r * gravity * breathe;
+    pos[i * 3 + 1] = by + Math.sin(time + r * 0.02) * 0.5;
+    pos[i * 3 + 2] = Math.sin(angle) * r * gravity * breathe;
+
+    const nx = pos[i * 3];
+    const ny = pos[i * 3 + 1];
+    const nz = pos[i * 3 + 2];
+
+    const len = Math.hypot(nx, ny, nz) || 1;
+
+    norm[i * 3]     = nx / len;
+    norm[i * 3 + 1] = ny / len;
+    norm[i * 3 + 2] = nz / len;
+
+  }
+
+  geometry.attributes.position.needsUpdate = true;
+  geometry.attributes.normal.needsUpdate = true;
+
+}
+
+
+// ---- Cinematic camera drift ----
+if (SHAPES[currentShapeIndex] === 'spiral') {
+
+  const t = performance.now() * 0.00008;
+
+  camera.position.x = Math.sin(t) * 12;
+  camera.position.z = 130 + Math.sin(t * 0.5) * 10;
+  camera.position.y = Math.cos(t * 0.7) * 6;
+  camera.lookAt(0, 0, 0);
+}
+
+  // -------- SATURN RING ORBIT MOTION --------
+  if (
+  SHAPES[currentShapeIndex] === 'saturn' &&
+  saturnRingBase &&
+  !isMorphing &&
+  galaxyTick % 2 < 1 &&
+  !customShapeActive
+) {
+
+  const speed = perfLevel === 1.0 ? 0.008 : perfLevel === 0.7 ? 0.004 : 0.002;
+  ringAngle += speed + handX * 0.002;
+
+
+  const posArr = geometry.attributes.position.array;
+
+  for (let i = 0; i < saturnRingCount; i++) {
+    const idx = saturnRingStart + i;
+
+    const bx = saturnRingBase[i * 2];
+const bz = saturnRingBase[i * 2 + 1];
+
+const r = Math.hypot(bx, bz);
+const baseAngle = Math.atan2(bz, bx);
+
+const swirl = Math.sin(baseAngle * 6 + ringAngle) * 0.008;
+const a = baseAngle + ringAngle * 0.04 + swirl;
+
+posArr[idx * 3]     = Math.cos(a) * r;
+posArr[idx * 3 + 2] = Math.sin(a) * r;
+
+  }
+
+  const posAttr = geometry.attributes.position;
+  posAttr.updateRange.offset = saturnRingStart * 3;
+  posAttr.updateRange.count  = saturnRingCount * 3;
+  posAttr.needsUpdate = true;
+
+}
+
+
+
+  if (currentTier === SIMULATION_TIER.IDLE) {
+  particles.rotation.x *= 0.98;
+  particles.rotation.y *= 0.98;
+  particles.rotation.z *= 0.98;
+
+  if (lastHandCount === 0) {
+  particles.rotation.y += 0.0008;
+}
+
+}
+
+  if (devMode && now - lastDevUpdate > DEV_UPDATE_INTERVAL) {
+  lastDevUpdate = now;
+
+  document.getElementById('dev-fps').textContent = fps;
+  document.getElementById('dev-ms').textContent = dt.toFixed(1);
+  document.getElementById('dev-particles').textContent = effectiveParticleCount;
+  document.getElementById('dev-shape').textContent =
+    SHAPES[currentShapeIndex];
+  document.getElementById('dev-profile').textContent =
+  edgeLightActive ? 'EDGE' : 'FULL';
+
+
+  document.getElementById('dev-hands').textContent = lastHandCount;
+  document.getElementById('dev-open').textContent = handOpenness.toFixed(2);
+  document.getElementById('dev-depth').textContent = depthFactor.toFixed(1);
+
+  document.getElementById('dev-perf').textContent = perfLevel.toFixed(2);
+  document.getElementById('dev-tier').textContent =
+    Object.keys(SIMULATION_TIER).find(k => SIMULATION_TIER[k] === currentTier);
+  document.getElementById('dev-edge').textContent =
+    edgeLightPerfMode ? 'ON' : 'OFF';
+  document.getElementById('dev-lock').textContent =
+    runtimeLocked ? 'YES' : 'NO';
+  
+  // ===== DEV FRAME LOAD HEAT BAR =====
+  const heat = Math.min(100, (avgFrameTime / 33) * 100);
+  const heatEl = document.getElementById('dev-heat');
+
+  if (heatEl) {
+    heatEl.style.width = heat.toFixed(0) + '%';
+    heatEl.style.background =
+      heat < 60 ? '#6aff9b' :
+      heat < 85 ? '#ffd36a' :
+                  '#ff6a6a';
+}
+
+
+  document.getElementById('dev-ambient').textContent =
+  ambientLightLevel.toFixed(3);
+
+  document.getElementById('dev-dark').textContent =
+  darkState ? 'YES' : 'NO';
+
+}
+
+  requestAnimationFrame(animate);
+
+ // ===== AUDIO REACTIVE PARTICLE VIBRATION =====
+const _musicActive = window.musicModeActive === true;
+let _energy, _bass, _mid, _high, _beat, _beatPulse;
+
+if (_musicActive && window.__musicEnergy__) {
+  const me = window.__musicEnergy__;
+  _bass = me.bass; _mid = me.mid; _high = me.high;
+  _beat = me.beat; _beatPulse = me.beatPulse || 0;
+  _energy = me.total;
+} else {
+  const ae = getUserAudioEnergy();
+  const aiBoost = document.body.classList.contains("ai-speaking") ? 0.3 : 0;
+  _energy = ae.energy + aiBoost;
+  _bass = ae.bass;
+  _mid = 0; _high = 0; _beat = false; _beatPulse = 0;
+}
+
+const rawEnergy   = _energy;
+const totalEnergy = Math.pow(rawEnergy, 1.7);
+
+const shouldVibrate = _musicActive
+  ? totalEnergy > 0.005
+  : (window.orbitalActive && totalEnergy > 0.01);
+
+if (!_musicActive && shouldVibrate && !isMorphing) {
+  const pos = geometry.attributes.position.array;
+  audioPulsePhase += _musicActive ? (0.012 + _bass * 0.04) : 0.015;
+
+  if (_musicActive) {
+
+    // ── Amplitude per band — small, soothing, not cheap ──
+    // Bass: max 3 units (was 8 — cut to 3, slow sine)
+    // Mid:  max 2 units lateral flow
+    // High: max 1 unit sparkle
+    // Beat: max 2 units directional only (not radial expand)
+    const bassAmp = _bass * 3.0;
+    const midAmp  = _mid  * 2.0;
+    const highAmp = _high * 1.0;
+    const beatAmp = _beatPulse * 2.0;
+
+    for (let i = 0; i < effectiveParticleCount; i++) {
+      const i3 = i * 3;
+      const bx = targetPositions[i3];
+      const by = targetPositions[i3 + 1];
+      const bz = targetPositions[i3 + 2];
+
+      // Determine dominant axis of this particle's rest position
+      const ax = Math.abs(bx), ay = Math.abs(by), az = Math.abs(bz);
+
+      const phase = audioPulsePhase + i * 0.014;
+
+      if (ax >= ay && ax >= az) {
+        // ── X-dominant particle → reacts to BASS ──
+        // Only the X component moves, slow sine wave
+        const d = Math.sign(bx) * Math.sin(phase * 0.5) * bassAmp
+                + Math.sign(bx) * beatAmp * 0.6;
+        pos[i3]     = bx + d;
+        pos[i3 + 1] = by;
+        pos[i3 + 2] = bz;
+
+      } else if (ay >= ax && ay >= az) {
+        // ── Y-dominant particle → reacts to MIDS ──
+        // Y flows up/down with melody, small lateral X drift
+        const dY = Math.sin(phase * 1.4 + by * 0.03) * midAmp;
+        const dX = Math.cos(phase * 1.1 + bx * 0.02) * midAmp * 0.4;
+        pos[i3]     = bx + dX;
+        pos[i3 + 1] = by + dY;
+        pos[i3 + 2] = bz;
+
+      } else {
+        // ── Z-dominant particle → reacts to HIGHS ──
+        // Z sparkles fast and subtle, tiny Y shimmer
+        const dZ = Math.sin(phase * 4.5 + i * 0.18) * highAmp;
+        const dY = Math.cos(phase * 3.8 + i * 0.12) * highAmp * 0.5;
+        pos[i3]     = bx;
+        pos[i3 + 1] = by + dY;
+        pos[i3 + 2] = bz + dZ;
+      }
+    }
+
+  } else {
+    // Voice mode — original uniform jitter, unchanged
+    const voiceAmp = 2.2 * totalEnergy + _bass * 2.5;
+    for (let i = 0; i < effectiveParticleCount; i++) {
+      const i3 = i * 3;
+      const phase = audioPulsePhase + i * 0.02;
+      const offset = Math.sin(phase) * voiceAmp;
+      pos[i3]     = targetPositions[i3]     + offset * 0.3;
+      pos[i3 + 1] = targetPositions[i3 + 1] + offset * 0.3;
+      pos[i3 + 2] = targetPositions[i3 + 2] + offset * 0.3;
+    }
+  }
+
+  geometry.attributes.position.needsUpdate = true;
+
+} else if (!_musicActive && !isMorphing) {
+  // Only sync positions when something actually changed (orbital active or just stopped vibrating)
+  if (window.orbitalActive || window._lastVoiceVibrating) {
+    const pos = geometry.attributes.position.array;
+    for (let i = 0; i < effectiveParticleCount * 3; i++) {
+      pos[i] = targetPositions[i];
+    }
+    geometry.attributes.position.needsUpdate = true;
+  }
+  window._lastVoiceVibrating = window.orbitalActive;
+}
+
+// ===== MINIMAL SIRI-STYLE SPEECH SHIFT =====
+
+const orbitalActive = window.orbitalActive === true;
+
+const userSpeaking = document.body.classList.contains("user-speaking");
+const aiSpeaking   = document.body.classList.contains("ai-speaking");
+
+// store stable base
+if (!material.__baseMid) {
+  material.__baseMid = material.uniforms.uMidColor.value.clone();
+  material.__baseHighlight = material.uniforms.uHighlightColor.value.clone();
+}
+
+// refresh base when silent and NOT in music mode
+if (!userSpeaking && !aiSpeaking && !_musicActive) {
+  material.__baseMid.copy(material.uniforms.uMidColor.value);
+  material.__baseHighlight.copy(material.uniforms.uHighlightColor.value);
+}
+
+let targetMid = material.__baseMid.clone();
+let targetHighlight = material.__baseHighlight.clone();
+
+if (orbitalActive) {
+
+  const shiftSpeed = performance.now() * 0.0008;
+  const subtleWave = Math.sin(shiftSpeed) * 0.04;
+
+  if (userSpeaking) {
+    // soft green lean
+    targetMid.offsetHSL(0.08, 0.15, subtleWave * 0.2);
+    targetHighlight.offsetHSL(0.08, 0.2, 0.05);
+  }
+
+  else if (aiSpeaking) {
+    // soft blue lean
+    targetMid.offsetHSL(-0.06, 0.12, subtleWave * 0.2);
+    targetHighlight.offsetHSL(-0.06, 0.15, 0.08);
+  }
+}
+
+// ===== reverse boom on sleep =====
+if (!orbitalActive && sleepCollapse > 0.001) {
+
+  sleepCollapse *= 0.90;
+
+  const collapsePulse = sleepCollapse * 0.5;
+
+  material.uniforms.uGlowBoost.value = 1.0 + collapsePulse;
+
+  // force faster return to base during collapse
+  targetMid = material.__baseMid.clone();
+  targetHighlight = material.__baseHighlight.clone();
+}
+
+// smooth blend
+material.uniforms.uMidColor.value.lerp(targetMid, 0.06);
+material.uniforms.uHighlightColor.value.lerp(targetHighlight, 0.06);
+
+renderer.render(scene, camera);
+
+// ================================================================
+//  MUSIC CINEMA MODE
+// ================================================================
+if (typeof window._mmCinema === 'undefined') {
+  window._mmCinema          = false;
+  window._mmCinemaLastInput = performance.now();
+  window._mmBgH = 0; window._mmBgS = 0; window._mmBgL = 0;
+  window._mmGlowExtra = 0;
+
+  document.addEventListener('mousemove', () => {
+    window._mmCinemaLastInput = performance.now();
+    if (window._mmCinema) { window._mmCinema = false; document.body.classList.remove('mm-cinema'); }
+  }, { passive: true });
+  document.addEventListener('mousedown', () => {
+    window._mmCinemaLastInput = performance.now();
+    if (window._mmCinema) { window._mmCinema = false; document.body.classList.remove('mm-cinema'); }
+  }, { passive: true });
+  document.addEventListener('touchstart', () => {
+    window._mmCinemaLastInput = performance.now();
+    if (window._mmCinema) { window._mmCinema = false; document.body.classList.remove('mm-cinema'); }
+  }, { passive: true });
+}
+{
+  const _isMusicMode = window.musicModeActive === true;
+  if (lastHandCount > 0) {
+    window._mmCinemaLastInput = performance.now();
+    if (window._mmCinema) { window._mmCinema = false; document.body.classList.remove('mm-cinema'); }
+  }
+  const _idleMs = performance.now() - window._mmCinemaLastInput;
+  if (_isMusicMode && !window._mmCinema && _idleMs >= 60000) {
+    window._mmCinema = true; document.body.classList.add('mm-cinema');
+  }
+  if (!_isMusicMode && window._mmCinema) {
+    window._mmCinema = false; document.body.classList.remove('mm-cinema');
+  }
+
+  if (!window._mmTint) window._mmTint = document.getElementById('mm-tint');
+  if (window._mmCinema && _isMusicMode) {
+    const me = window.__musicEnergy__ || {};
+    const mmBeat = me.beat||false, mmPulse = me.beatPulse||0, mmTotal = me.total||0;
+    // Target opacity: very low (0.0 to 0.55 max) — just a whisper of purple tint
+    // Pulses slightly on beat but never overpowers particles
+    const targOpacity = Math.min(0.30, mmTotal * 0.18 + mmPulse * 0.14);
+    window._mmTintOpacity = (window._mmTintOpacity || 0);
+    window._mmTintOpacity += (targOpacity - window._mmTintOpacity) * (mmBeat ? 0.15 : 0.03);
+    if (window._mmTint) window._mmTint.style.opacity = window._mmTintOpacity;
+    if (mmBeat) window._mmGlowExtra = Math.min(2.5, window._mmGlowExtra + mmPulse * 1.8);
+    window._mmGlowExtra *= 0.88;
+  } else {
+    window._mmTintOpacity = (window._mmTintOpacity || 0) * 0.94;
+    window._mmGlowExtra = (window._mmGlowExtra || 0) * 0.92;
+    if (window._mmTint) window._mmTint.style.opacity = window._mmTintOpacity;
+  }
+
+  if (window._mmCinema && window._mmGlowExtra > 0.01)
+    material.uniforms.uGlowBoost.value = (material.uniforms.uGlowBoost.value || 1.0) + window._mmGlowExtra;
+}
+
+}
+
+/* =====================================================
+   BOOT SEQUENCE (REPLACES DIRECT animate() CALL)
+   ===================================================== */
+  (async function boot() {
+  const loader = document.getElementById('loader');
+  window._introAnimDone = false;
+  systemReady = false;
+
+  // ---- GPU benchmark ----
+  const benchScene = new THREE.Scene();
+  const benchCam = new THREE.PerspectiveCamera(60, 1, 0.1, 500);
+  benchCam.position.z = 120;
+
+
+  // 🔒 hide WebGL canvas during benchmark to prevent white flash
+  const canvas = renderer.domElement;
+  const prevVisibility = canvas.style.visibility;
+  canvas.style.visibility = "hidden";
+
+  const safeCount = await benchmarkParticles(renderer, benchScene, benchCam);
+  // 🔓 restore canvas after benchmark
+  canvas.style.visibility = "visible";
+
+  benchScene.clear();
+
+  MAX_PARTICLES = safeCount;
+
+  const FULL_PARTICLES = safeCount;
+  const EDGE_PARTICLES = Math.floor(safeCount * 0.6);
+
+  window.__PARTICLE_PROFILES__ = {
+    FULL: FULL_PARTICLES,
+    EDGE: EDGE_PARTICLES
+  };
+
+  effectiveParticleCount = FULL_PARTICLES;
+  geometry.setDrawRange(0, effectiveParticleCount);
+
+  runtimeLocked = true;
+
+  console.log('[BOOT] Particle budget:', safeCount);
+
+  systemReady = true;
+
+  // wait for BOTH: benchmark done + intro animation done
+  await new Promise(resolve => {
+    const check = () => {
+      if (systemReady && window._introAnimDone) {
+        resolve();
+      } else {
+        requestAnimationFrame(check);
+      }
+    };
+    check();
+  });
+
+  // loader is the intro container — just remove it
+  loader.remove();
+})();
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function enterFullscreen() {
+
+  // If already fullscreen, do nothing
+  if (document.fullscreenElement) return;
+
+  const element = document.documentElement;
+
+  if (element.requestFullscreen) {
+    element.requestFullscreen().catch(err => {
+      console.warn("Fullscreen failed:", err);
+    });
+  } 
+  else if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen();
+  } 
+  else if (element.msRequestFullscreen) {
+    element.msRequestFullscreen();
+  }
+}
+
+// ==================== START ====================
+function startMainExperience(e, skipIntro = false) {
+
+  if (!window.CURRENT_USER) {
+  alert("Login required");
+  return;
+  }
+
+
+
+  if (experienceStarted) return;
+
+  experienceStarted = true;
+
+  // 🔓 Reveal hand tracking UI AFTER full load
+document.getElementById('handStatus').style.display = 'block';
+document.getElementById('skeleton').style.display = 'block';
+
+  handStatusEl.style.display = "block";
+
+  if (window.updateUserPanel) {
+  setTimeout(window.updateUserPanel, 100);
+  }
+  runtimeLocked = true;
+
+  showWelcomeMessage(window.CURRENT_USER.username);
+
+  setTimeout(() => {
+  const hint = document.getElementById("gestureHint");
+  hint.style.opacity = 1;
+
+  setTimeout(() => {
+    hint.style.opacity = 0;
+  }, 6000);
+
+}, 3500);
+
+
+  const intro = document.getElementById('intro');
+  const loader = document.getElementById('loader');
+
+  // DEV SKIP
+  if (skipIntro) {
+    if (loader) loader.remove();
+    if (intro) intro.remove();
+  } else {
+    if (intro) intro.classList.add('exit');
+  }
+
+  setTimeout(async () => {
+    if (!skipIntro && intro) intro.remove();
+
+    try {
+      await startCamera();
+
+      // Initialize Orbital Voice AFTER experience starts
+    initOrbitalVoice({
+  backendUrl: window.BACKEND_URL,
+    
+  onPulse: (active) => {
+    const core = document.querySelector(".transition-core");
+    if (core) {
+      core.style.transform = active ? "scale(1.8)" : "scale(1)";
+      core.style.boxShadow = active
+        ? "0 0 120px #9b4dff, 0 0 200px #ff6fd8"
+        : "0 0 60px #9b4dff";
+    }
+    
+    if (typeof window.setOrbState === "function") {
+      window.setOrbState(active ? "speaking" : (window.orbitalActive ? "listening" : "idle"));
+    }
+  }
+});
+
+      // 🔓 FAILSAFE: ensure visuals unlock even if welcome timing fails
+setTimeout(() => {
+  if (!visualsReady) {
+    visualsReady = true;
+    renderer.domElement.style.opacity = "1";
+
+    console.warn("[SAFE UNLOCK] visualsReady forced true");
+  }
+  }, 3000);
+
+    } catch (err) {
+      handStatusEl.textContent = 'Camera permission denied';
+      console.error(err);
+    }
+  }, skipIntro ? 0 : 1200);
+}
+
+
+handStatusEl.addEventListener('click', (e) => {
+  enterFullscreen(e);
+});
+
+
+
+document.getElementById('devProfileBtn').addEventListener('click', () => {
+  if (!window.CURRENT_USER || window.CURRENT_USER.role !== "developer") return;
+  if (!devMode) return;
+
+  if (devForceProfile === null) devForceProfile = 'EDGE';
+  else if (devForceProfile === 'EDGE') devForceProfile = 'FULL';
+  else devForceProfile = null;
+});
+
+
+document.getElementById('devShapeBtn').addEventListener('click', () => {
+  if (!window.CURRENT_USER || window.CURRENT_USER.role !== "developer") return;
+  if (!devMode) return;
+  if (isMorphing) return;
+
+  const now = performance.now();
+  if (now - lastShapeSwitchTime < SHAPE_SWITCH_COOLDOWN_MS) return;
+
+  switchShape(1);
+});
+
+
+document.getElementById('devEditBtn').addEventListener('click', () => {
+
+  if (!window.CURRENT_USER || window.CURRENT_USER.role !== "developer") return;
+  if (!devMode) return;
+  if (currentMode === APP_MODE.VIEW) {
+    enterEditMode();
+  } else {
+    exitEditMode();
+  }
+});
+
+
+document.getElementById('devGenerateBtn').addEventListener('click', () => {
+
+  if (!window.CURRENT_USER || window.CURRENT_USER.role !== "developer") return;
+  if (!devMode) return;
+  if (currentMode !== APP_MODE.EDIT) return;
+  if (currentPath.length < 10) return;
+
+  generateShapeFromPath();
+});
+
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+document.addEventListener('fullscreenchange', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+    if (!document.fullscreenElement) {
+    document.body.style.cursor = 'default';
+    handStatusEl.textContent = 'Tap here to re-enter fullscreen';
+  }
+});
+
+
+const modal = document.getElementById("createProfileModal");
+
+const authTabs = document.querySelectorAll(".auth-tab");
+const registerExtras = document.getElementById("registerExtras");
+const authSubmitBtn = document.getElementById("authSubmitBtn");
+
+let authMode = "login";
+
+// Default state = login
+registerExtras.classList.add("hidden");
+authSubmitBtn.textContent = "Login";
+
+authTabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    authTabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+
+    authMode = tab.dataset.mode;
+
+    if (authMode === "login") {
+      registerExtras.classList.remove("visible");
+      registerExtras.classList.add("hidden");
+      authSubmitBtn.textContent = "Login";
+    } else {
+      registerExtras.classList.remove("hidden");
+      registerExtras.classList.add("visible");
+      authSubmitBtn.textContent = "Register";
+    }
+  });
+});
+
+const vibeGroup = document.getElementById("vibeGroup");
+const createBtn = document.getElementById("authSubmitBtn");
+
+vibeGroup.addEventListener("click", (e) => {
+  const btn = e.target.closest(".pill");
+  if (!btn) return;
+
+  // remove active state
+  vibeGroup.querySelectorAll(".pill")
+    .forEach(p => p.classList.remove("active"));
+
+  // activate selected
+  btn.classList.add("active");
+
+  // update logical state
+  selectedVibe = btn.dataset.vibe;
+
+  // update Create button gradient
+  const [c1, c2] = VIBE_COLORS[selectedVibe];
+
+  // update CSS variables
+  createBtn.style.setProperty("--vibe-a", c1);
+  createBtn.style.setProperty("--vibe-b", c2);
+
+  createBtn.style.boxShadow = `0 0 36px ${c1}66`;
+
+  // restart wave animation cleanly
+  createBtn.style.animation = "none";
+  createBtn.offsetHeight; // force reflow
+  createBtn.style.animation = "vibeWave 6s ease infinite";
+});
+
+authSubmitBtn.addEventListener("click", async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const name = document.getElementById("newProfileName").value.trim();
+  const password = document.getElementById("newProfilePassword").value.trim();
+
+  if (!name || !password) {
+    alert("Username and password required");
+    return;
+  }
+
+  // Visual Confirmation & Loading State
+  const originalText = authSubmitBtn.textContent;
+  authSubmitBtn.textContent = "Authenticating...";
+  authSubmitBtn.disabled = true;
+  authSubmitBtn.style.opacity = "0.7";
+  authSubmitBtn.style.cursor = "not-allowed";
+
+  try {
+    if (authMode === "register") {
+      const gender = document.getElementById("newProfileGender").value;
+      const res = await fetch(`${window.BACKEND_URL}/api/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          username: name, 
+          password, 
+          gender,
+          vibe: selectedVibe
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.error || "Registration failed");
+        authSubmitBtn.textContent = originalText;
+        authSubmitBtn.disabled = false;
+        authSubmitBtn.style.opacity = "1";
+        authSubmitBtn.style.cursor = "pointer";
+        return;
+      }
+    }
+
+    // login flow (shared)
+    const loginRes = await fetch(`${window.BACKEND_URL}/api/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: name, password })
+    });
+
+    if (!loginRes.ok) {
+      const err = await loginRes.json();
+      alert(err.error || "Invalid credentials");
+      authSubmitBtn.textContent = originalText;
+      authSubmitBtn.disabled = false;
+      authSubmitBtn.style.opacity = "1";
+      authSubmitBtn.style.cursor = "pointer";
+      return;
+    }
+
+    const loginData = await loginRes.json();
+    localStorage.setItem("token", loginData.token);
+
+    const meRes = await fetch(`${window.BACKEND_URL}/api/me`, {
+      headers: { Authorization: `Bearer ${loginData.token}` }
+    });
+
+    const user = await meRes.json();
+    window.CURRENT_USER = user;
+
+    // CLEAR INPUT FIELDS
+    document.getElementById("newProfileName").value = "";
+    document.getElementById("newProfilePassword").value = "";
+
+    // Hide Login Modal
+    const modal = document.getElementById("createProfileModal");
+    modal.classList.add("hidden");
+    
+    // Set Vibe
+    window.ACTIVE_VIBE = user.vibe || selectedVibe || "calm";
+    applyVibe(window.ACTIVE_VIBE);
+
+    // Transition and Start
+    const transition = document.getElementById("loginTransition") || createTransitionElement();
+    transition.classList.remove("hidden");
+    transition.classList.add("active");
+
+    setTimeout(() => {
+      startMainExperience(null, true);
+      setTimeout(() => {
+        transition.classList.remove("active");
+        setTimeout(() => {
+          transition.classList.add("hidden");
+          authSubmitBtn.textContent = originalText;
+          authSubmitBtn.disabled = false;
+          authSubmitBtn.style.opacity = "1";
+        }, 650);
+      }, 400);
+    }, 800);
+
+  } catch (err) {
+    console.error("Auth Error:", err);
+    alert("An error occurred during authentication. Please try again.");
+    authSubmitBtn.textContent = originalText;
+    authSubmitBtn.disabled = false;
+    authSubmitBtn.style.opacity = "1";
+    authSubmitBtn.style.cursor = "pointer";
+  }
+});
+
+function createTransitionElement() {
+  const trans = document.createElement("div");
+  trans.id = "loginTransition";
+  trans.className = "login-transition hidden";
+  trans.innerHTML = '<div class="transition-core"></div>';
+  document.body.appendChild(trans);
+  return trans;
+}
+
+
+// ================= DEV ADMIN CONTROLS =================
+
+const devAdminToggle = document.getElementById("devAdminToggle");
+const devMorph = document.getElementById("devMorph");
+const devGlow = document.getElementById("devGlow");
+const devMotion = document.getElementById("devMotion");
+const devBreathe = document.getElementById("devBreathe");
+const devMorphVal = document.getElementById("devMorphVal");
+const devGlowVal = document.getElementById("devGlowVal");
+const devMotionVal = document.getElementById("devMotionVal");
+const devBreatheVal = document.getElementById("devBreatheVal");
+
+
+function syncDevSliders() {
+  if (!window.CURRENT_USER) return;
+
+  const morph = window.CURRENT_USER.customMorphSpeed ?? 1;
+  const glow = window.CURRENT_USER.customGlow ?? 1;
+  const motion = window.CURRENT_USER.customMotionDamp ?? 1;
+  const breathe = window.CURRENT_USER.customBreatheSpeed ?? 1;
+
+  if (devAdminToggle)
+  devAdminToggle.checked = false;
+
+  if (devMorph) {
+    devMorph.value = morph;
+    if (devMorphVal) devMorphVal.textContent = morph.toFixed(2);
+  }
+
+  if (devGlow) {
+    devGlow.value = glow;
+    if (devGlowVal) devGlowVal.textContent = glow.toFixed(2);
+  }
+
+  if (devMotion) {
+    devMotion.value = motion;
+    if (devMotionVal) devMotionVal.textContent = motion.toFixed(2);
+  }
+
+  if (devBreathe) {
+    devBreathe.value = breathe;
+    if (devBreatheVal) devBreatheVal.textContent = breathe.toFixed(2);
+  }
+}
+
+
+devAdminToggle.addEventListener("change", () => {
+  // purely local toggle now
+  applyVibe(window.ACTIVE_VIBE);
+});
+
+
+devMorph.addEventListener("input", async () => {
+
+  const value = parseFloat(devMorph.value);
+  devMorphVal.textContent = value.toFixed(2);
+
+  window.CURRENT_USER.customMorphSpeed = value;
+  applyVibe(window.ACTIVE_VIBE);
+});
+
+
+
+devGlow.addEventListener("input", async () => {
+
+  const value = parseFloat(devGlow.value);
+  devGlowVal.textContent = value.toFixed(2);
+
+  window.CURRENT_USER.customGlow = value;
+  applyVibe(window.ACTIVE_VIBE);
+});
+
+
+devMotion.addEventListener("input", async () => {
+
+  const value = parseFloat(devMotion.value);
+  devMotionVal.textContent = value.toFixed(2);
+
+  window.CURRENT_USER.customMotionDamp = value;
+  applyVibe(window.ACTIVE_VIBE);
+});
+
+
+devBreathe.addEventListener("input", async () => {
+
+  const value = parseFloat(devBreathe.value);
+  devBreatheVal.textContent = value.toFixed(2);
+
+  window.CURRENT_USER.customBreatheSpeed = value;
+  applyVibe(window.ACTIVE_VIBE);
+});
+
+
+document.getElementById("devResetAdmin").addEventListener("click", async () => {
+
+  delete window.CURRENT_USER.customMorphSpeed;
+  delete window.CURRENT_USER.customGlow;
+  delete window.CURRENT_USER.customMotionDamp;
+  delete window.CURRENT_USER.customBreatheSpeed;
+
+  applyVibe(window.ACTIVE_VIBE);
+
+  if (devMode) {
+    syncDevSliders();
+  }
+});
+
+
+//Vibe selector Dev- Control
+document.querySelectorAll(".devMoodBtn").forEach(btn => {
+
+  btn.addEventListener("click", async () => {
+
+    if (!window.CURRENT_USER || window.CURRENT_USER.role !== "developer") return;
+
+    const newVibe = btn.dataset.vibe;
+
+    // Apply immediately
+    window.ACTIVE_VIBE = newVibe;
+    applyVibe(newVibe);
+
+    // Persist to backend
+    try {
+      await fetch(`${window.BACKEND_URL}/api/update-vibe`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ vibe: newVibe })
+      });
+
+      console.log("Developer vibe updated:", newVibe);
+
+    } catch (err) {
+      console.error("Failed to update vibe:", err);
+    }
+
+  });
+
+});
+
+
+document.addEventListener('keydown', (e) => {
+  // Alt + `
+  if (e.altKey && e.code === 'Backquote') {
+
+  if (!window.CURRENT_USER || window.CURRENT_USER.role !== "developer") {
+    console.warn("Developer access required");
+    return;
+  }
+
+  devMode = !devMode;
+  window.devModeActive = devMode;
+  if (window.musicModeDevSync) window.musicModeDevSync(devMode);
+
+  const panel = document.getElementById('devPanel');
+  panel.style.display = devMode ? 'block' : 'none';
+
+  console.log('[DEV MODE]', devMode ? 'ENABLED' : 'DISABLED');
+
+  const chat = document.getElementById("dev-chat-panel");
+
+  if (chat) {
+    if (devMode) {
+      chat.style.display = "flex";
+      requestAnimationFrame(() => chat.classList.add("open"));
+    } else {
+      chat.classList.remove("open");
+      setTimeout(() => { if (!devMode) chat.style.display = "none"; }, 350);
+    }
+  }
+}
+
+});
+
+
+const settingsTrigger = document.getElementById("settingsTrigger");
+
+/* Toggle panel on click */
+settingsTrigger.addEventListener("click", () => {
+  userPanel.classList.toggle("show");
+});
+
+/* Show orb on mouse movement so user can access settings */
+let orbMouseTimeout;
+
+document.addEventListener("mousemove", () => {
+  if (settingsTrigger.style.display === "none") return;
+  settingsTrigger.classList.add("orb-mouse-visible");
+  clearTimeout(orbMouseTimeout);
+  orbMouseTimeout = setTimeout(() => {
+    settingsTrigger.classList.remove("orb-mouse-visible");
+  }, 2000);
+});
+
+document.addEventListener("touchstart", () => {
+  if (settingsTrigger.style.display === "none") return;
+  settingsTrigger.classList.add("orb-mouse-visible");
+  clearTimeout(orbMouseTimeout);
+  orbMouseTimeout = setTimeout(() => {
+    settingsTrigger.classList.remove("orb-mouse-visible");
+  }, 2000);
+});
+
+
+/* ── SIRI-STYLE 3D ORB ANIMATOR ── */
+(function () {
+  const canvas = document.getElementById("orbWaveCanvas");
+  const ctx    = canvas.getContext("2d");
+  const S      = 54;
+  const CX     = S / 2;
+  const CY     = S / 2;
+  const R      = 25;
+
+  let orbState = "idle";
+
+window.setOrbState = function (state) {
+    orbState = state;
+    settingsTrigger.classList.toggle("orb-active",    state !== "idle");
+    settingsTrigger.classList.toggle("orb-listening", state === "listening");
+    settingsTrigger.classList.toggle("orb-speaking",  state === "speaking");
+    // When AI activates, make orb fully visible regardless of mouse
+    if (state !== "idle") {
+      settingsTrigger.classList.add("orb-mouse-visible");
+    }
+  };
+
+  // Three ribbons — purple, pink, teal — like Siri
+  const ribbons = [
+    { tilt: -0.5, speed: 0.50, r: 155, g: 77,  b: 255, alpha: 0.80 },
+    { tilt:  0.7, speed: 0.65, r: 255, g: 80,  b: 200, alpha: 0.70 },
+    { tilt:  1.2, speed: 0.42, r: 0,   g: 210, b: 185, alpha: 0.60 },
+  ];
+
+  function drawRibbon(t, rib, amp) {
+    const phase = t * rib.speed;
+    const pts   = 100;
+    const top   = [];
+    const bot   = [];
+
+    for (let i = 0; i <= pts; i++) {
+      const u    = (i / pts) * Math.PI * 2;
+      // 3D point on sphere surface
+      const warp = 1 + amp * Math.sin(u * 2.5 + phase * 1.4) * 0.28;
+      const x3   = Math.cos(u) * R * warp;
+      const y3   = Math.sin(u + rib.tilt) * R * 0.42 * warp;
+      const z3   = Math.sin(u + phase) * R * 0.3;
+
+      // Perspective depth
+      const depth = 1 + z3 / (R * 2.8);
+      const px    = CX + x3 * depth;
+      const py    = CY + y3 * depth;
+
+      // Ribbon thickness varies with depth + audio
+      const thick = (3.8 + amp * 5) * depth;
+      const nx    = -Math.sin(u) * 0.5;
+      const ny    =  Math.cos(u + rib.tilt) * 0.42 * 0.5;
+      const len   = Math.sqrt(nx * nx + ny * ny) || 1;
+
+      top.push([px + (nx / len) * thick, py + (ny / len) * thick, depth]);
+      bot.push([px - (nx / len) * thick, py - (ny / len) * thick, depth]);
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(top[0][0], top[0][1]);
+    for (let i = 1; i < top.length; i++) ctx.lineTo(top[i][0], top[i][1]);
+    for (let i = bot.length - 1; i >= 0; i--) ctx.lineTo(bot[i][0], bot[i][1]);
+    ctx.closePath();
+
+    // Gradient gives ribbon the shiny 3D look
+    const g = ctx.createLinearGradient(CX - R, CY, CX + R, CY);
+    g.addColorStop(0,   `rgba(${rib.r},${rib.g},${rib.b},0)`);
+    g.addColorStop(0.25,`rgba(${rib.r},${rib.g},${rib.b},${rib.alpha * 0.6})`);
+    g.addColorStop(0.5, `rgba(${Math.min(rib.r+70,255)},${Math.min(rib.g+70,255)},${Math.min(rib.b+70,255)},${rib.alpha})`);
+    g.addColorStop(0.75,`rgba(${rib.r},${rib.g},${rib.b},${rib.alpha * 0.6})`);
+    g.addColorStop(1,   `rgba(${rib.r},${rib.g},${rib.b},0)`);
+    ctx.fillStyle = g;
+    ctx.fill();
+  }
+
+  function frame() {
+    requestAnimationFrame(frame);
+    ctx.clearRect(0, 0, S, S);
+    if (orbState === "idle") return;
+
+    const t = performance.now() / 1000;
+
+    let energy = 0, bass = 0;
+    if (typeof getUserAudioEnergy === "function") {
+      const e = getUserAudioEnergy();
+      energy = e.energy || 0;
+      bass   = e.bass   || 0;
+    }
+
+    const amp = orbState === "listening"
+      ? Math.max(energy * 2.8, 0.18)
+      : Math.max(bass   * 2.2, 0.14);
+
+    // Clip everything to sphere boundary
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(CX, CY, R, 0, Math.PI * 2);
+    ctx.clip();
+
+    // Draw three Siri-style ribbons
+    for (const rib of ribbons) drawRibbon(t, rib, amp);
+
+    // Bright white core glow — the Siri centre star
+    const cg = ctx.createRadialGradient(CX, CY - 3, 0, CX, CY, 16);
+    cg.addColorStop(0,   `rgba(255,255,255,${0.65 + amp * 0.25})`);
+    cg.addColorStop(0.3, `rgba(210,180,255,${0.3  + amp * 0.2})`);
+    cg.addColorStop(0.7, `rgba(155,77,255, ${0.1  + amp * 0.1})`);
+    cg.addColorStop(1,   "rgba(0,0,0,0)");
+    ctx.fillStyle = cg;
+    ctx.fillRect(0, 0, S, S);
+
+    ctx.restore();
+  }
+
+  frame();
+})();
+
+
+/* ================= USER PANEL LOGIC (FIXED) ================= */
+
+const userPanel = document.getElementById("controlPanel");
+const userEditToggle = document.getElementById("userEditToggle");
+const userEditControls = document.getElementById("userEditControls");
+const userGenerateBtn = document.getElementById("userGenerateBtn");
+const userClearBtn = document.getElementById("userClearBtn");
+const userLogoutBtn = document.getElementById("userLogoutBtn");
+
+window.updateUserPanel = function updateUserPanel() {
+
+  if (!experienceStarted) {
+    settingsTrigger.style.display = "";
+    settingsTrigger.classList.remove("orb-ready");
+    return;
+  }
+
+  settingsTrigger.style.display = "";
+  settingsTrigger.classList.add("orb-ready");
+
+  if (currentMode === APP_MODE.EDIT) {
+    userEditToggle.innerHTML = "✦ Exit Draw";
+  } else {
+    userEditToggle.innerHTML = "✦ Draw Mode";
+  }
+}
+
+userEditToggle.addEventListener("click", () => {
+
+  if (currentMode === APP_MODE.VIEW) {
+    enterEditMode();
+  } else {
+    exitEditMode(false);
+  }
+
+  updateUserPanel();
+});
+
+document.getElementById("musicModeBtn").addEventListener("click", () => {
+  if (window.musicMode) window.musicMode.toggle();
+  const btn = document.getElementById("musicModeBtn");
+  btn.textContent = window.musicMode.isActive() ? "♫ Exit Music" : "♫ Music Mode";
+});
+
+userGenerateBtn.addEventListener("click", () => {
+
+  console.log("Generate clicked");
+
+  if (currentMode !== APP_MODE.EDIT) {
+    console.log("Blocked: Not in EDIT mode");
+    return;
+  }
+
+  if (currentPath.length < 5) {
+    console.log("Blocked: Path too short", currentPath.length);
+    return;
+  }
+
+  console.log("Calling generateShapeFromPath()");
+  generateShapeFromPath();
+});
+
+userClearBtn.addEventListener("click", () => {
+  if (currentMode !== APP_MODE.EDIT) return;
+
+  currentPath = [];
+  drawEditor();
+});
+
+userLogoutBtn.addEventListener("click", () => {
+  localStorage.removeItem("token");
+  window.CURRENT_USER = null;
+  experienceStarted = false;
+  location.reload();
+});
+
+// Auto restore session
+document.addEventListener("DOMContentLoaded", async () => {
+
+  const token = localStorage.getItem("token");
+
+if (!token) {
+  document.getElementById("createProfileModal").classList.remove("hidden");
+  return;
+}
+
+
+let res;
+  try {
+    res = await fetch(`${window.BACKEND_URL}/api/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+} catch (networkErr) {
+    const retries = (window._sessionNetRetries || 0) + 1;
+    window._sessionNetRetries = retries;
+    if (retries <= 5) {
+      const delay = Math.min(1000 * retries, 5000);
+      setTimeout(async () => {
+        const t2 = localStorage.getItem("token");
+        if (!t2) { document.getElementById("createProfileModal").classList.remove("hidden"); return; }
+        try {
+          const r2 = await fetch(`${window.BACKEND_URL}/api/me`, { headers: { Authorization: `Bearer ${t2}` } });
+          if (r2.ok) {
+            window.CURRENT_USER = await r2.json();
+            window._sessionNetRetries = 0;
+            document.getElementById("createProfileModal").classList.add("hidden");
+          }
+        } catch {}
+      }, delay);
+    } else {
+      window._sessionNetRetries = 0;
+      document.getElementById("createProfileModal").classList.remove("hidden");
+    }
+    return;
+  }
+
+  if (res.status === 401 || res.status === 403) {
+    // Only wipe token when server explicitly rejects it
+    localStorage.removeItem("token");
+    document.getElementById("createProfileModal").classList.remove("hidden");
+    return;
+  }
+
+  if (!res.ok) {
+    if (window._sessionRestoreRetries == null) window._sessionRestoreRetries = 0;
+    window._sessionRestoreRetries++;
+    if (window._sessionRestoreRetries < 4) {
+      setTimeout(() => { window._sessionRestoreRetries = 0; }, 8000);
+      return;
+    }
+    document.getElementById("createProfileModal").classList.remove("hidden");
+    return;
+  }
+
+  const user = await res.json();
+
+  window.CURRENT_USER = user;
+
+document.getElementById("newProfileName").value = "";
+document.getElementById("newProfilePassword").value = "";
+
+modal.classList.add("hidden");
+
+window.ACTIVE_VIBE = user.vibe || selectedVibe || "calm";
+
+applyVibe(window.ACTIVE_VIBE);
+startMainExperience(null, true);
+handStatusEl.textContent = 'Tap here to enter fullscreen';
+});
+
+document.querySelector(".profile-modal-card")
+  .addEventListener("submit", e => {
+    e.preventDefault();
+    document.getElementById("authSubmitBtn").click();
+  });
+
+// ── CHAT PERSISTENCE + CONTEXT ──
+// sessionStorage keeps messages alive across soft reloads (same tab)
+// window.getChatContext() is called by orbitalVoice.js to give AI memory of recent chat
+const CHAT_KEY = "orbital_chat_history";
+
+function _appendBubble(container, sender, text) {
+  const bubble = document.createElement("div");
+  bubble.classList.add("chat-bubble");
+  bubble.classList.add(sender === "user" ? "chat-user" : "chat-orbital");
+  bubble.textContent = text;
+  container.appendChild(bubble);
+  container.scrollTop = container.scrollHeight;
+}
+
+// Restore saved conversation when page loads
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    const container = document.getElementById("dev-chat-messages");
+    if (!container) return;
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(CHAT_KEY) || "[]");
+      saved.forEach(({ sender, text }) => _appendBubble(container, sender, text));
+    } catch {}
+  }, 600);
+});
+
+// Called by orbitalVoice.js — returns last N exchanges as context string for the AI
+window.getChatContext = function (maxMessages = 10) {
+  try {
+    const history = JSON.parse(sessionStorage.getItem(CHAT_KEY) || "[]");
+    const recent = history.slice(-maxMessages);
+    if (recent.length === 0) return null;
+    return recent
+      .map(({ sender, text }) => `${sender === "user" ? "User" : "Orbital"}: ${text}`)
+      .join("\n");
+  } catch {
+    return null;
+  }
+};
+
+window.addChatMessage = function (sender, text) {
+  const container = document.getElementById("dev-chat-messages");
+  if (!container) return;
+  _appendBubble(container, sender, text);
+  // Save to sessionStorage
+  try {
+    const history = JSON.parse(sessionStorage.getItem(CHAT_KEY) || "[]");
+    history.push({ sender, text });
+    if (history.length > 200) history.splice(0, history.length - 200);
+    sessionStorage.setItem(CHAT_KEY, JSON.stringify(history));
+  } catch {}
+};
+
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.101.1",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
+    "express": "^4.22.1",
+    "groq-sdk": "^0.37.0",
+    "jsonwebtoken": "^9.0.2",
+    "node-fetch": "^3.3.2"
+  }
+}

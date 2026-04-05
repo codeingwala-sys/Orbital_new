@@ -1,0 +1,4120 @@
+<!-- updated on 13-02-2026 9:54pm -->
+<!-- generate shape updated and gesture added and enter button function added-->
+ <!-- login details can be viewed -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gesture Controlled Particle Universe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+
+    body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+    :root {
+  --accent: #9b4dff;
+  --accent-soft: rgba(155, 77, 255, 0.35);
+  --glass-dark: rgba(12, 8, 22, 0.55);
+  --glass-light: rgba(255, 255, 255, 0.12);
+  --text-main: #e6e6e6;
+  --text-muted: #a8a8b3;
+  
+}
+
+    body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at center, rgba(155,77,255,0.06), transparent 70%);
+}
+
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #000;
+      width: 100%;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    canvas { display: block; }
+    
+    #video {
+    display: none;
+    transform: scaleX(-1);
+    }
+
+
+    #skeleton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 260px;
+  height: 260px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at top left, rgba(155,77,255,0.15), transparent 60%),
+    var(--glass-dark);
+  box-shadow:
+    0 0 40px rgba(155,77,255,0.35),
+    inset 0 0 0 1px rgba(255,255,255,0.12);
+  backdrop-filter: blur(14px);
+  z-index: 8;
+}
+
+  /* ===== ORBITAL CINEMATIC INTRO ===== */
+
+#intro {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  z-index: 10;
+}
+
+#intro video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#intro video {
+  min-width: 100%;
+  min-height: 100%;
+  object-position: center center;
+}
+
+
+#intro .intro-btn {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.intro-btn:hover {
+  background: rgba(155,77,255,0.12);
+  box-shadow: 0 0 36px rgba(155,77,255,0.55);
+  transform: translateY(-1px);
+}
+
+
+    .intro-btn {
+  padding: 14px 44px;
+  font-size: 0.95rem;
+  letter-spacing: 1.5px;
+  color: #fff;
+  background:
+    linear-gradient(135deg, #b98cff, #6a0dad);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow:
+    0 0 24px var(--accent-soft),
+    inset 0 0 0 1px rgba(255,255,255,0.2);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.intro-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 34px rgba(155,77,255,0.65);
+}
+
+.intro-box {
+  position: relative;
+}
+
+
+  #handStatus {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 28px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+
+  background:
+    linear-gradient(135deg,
+      rgba(155,77,255,0.22),
+      rgba(90,40,160,0.18)),
+    var(--glass-dark);
+
+  color: #e8e2ff;
+
+  box-shadow:
+    0 0 32px rgba(155,77,255,0.35),
+    inset 0 0 0 1px rgba(255,255,255,0.18);
+
+  backdrop-filter: blur(14px);
+  z-index: 9;
+
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+
+#handStatus::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.12),
+    rgba(255,255,255,0)
+  );
+  pointer-events: none;
+}
+
+
+    #handStatus.tracking {
+  color: #caffb3;
+  box-shadow:
+    0 0 26px rgba(120,255,160,0.55),
+    inset 0 0 0 1px rgba(120,255,160,0.35);
+}
+
+#handStatus.tracking {
+  box-shadow:
+    0 0 36px rgba(155,77,255,0.6),
+    inset 0 0 0 1px rgba(200,170,255,0.45);
+}
+
+#handStatus.twohand {
+  box-shadow:
+    0 0 32px rgba(255,200,120,0.55),
+    inset 0 0 0 1px rgba(255,200,120,0.45);
+}
+
+
+#handStatus.lost {
+  color: #ffb3b3;
+  box-shadow:
+    0 0 26px rgba(255,100,100,0.55),
+    inset 0 0 0 1px rgba(255,100,100,0.35);
+}
+
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+  canvas {
+  position: relative;
+  z-index: 0;
+  filter: contrast(1.05) saturate(1.05);
+}
+
+#handStatus.twohand {
+  color: #f3d7a6; /* softer gold */
+  box-shadow:
+    0 0 14px rgba(255, 200, 120, 0.35),
+    inset 0 0 0 1px rgba(255, 200, 120, 0.35);
+}
+
+#skeleton.twohand {
+  box-shadow:
+    0 0 26px rgba(255, 200, 120, 0.35),
+    inset 0 0 0 1px rgba(255, 200, 120, 0.35);
+}
+
+#skeleton.twohand {
+  animation: pulseSoft 2.4s ease-in-out infinite;
+}
+
+@keyframes pulseSoft {
+  0%, 100% { box-shadow: 0 0 22px rgba(255,200,120,0.28); }
+  50%      { box-shadow: 0 0 28px rgba(255,200,120,0.38); }
+}
+
+#handStatus {
+  cursor: pointer;
+}
+
+#handStatus:hover {
+  box-shadow:
+    0 0 34px rgba(155,77,255,0.55),
+    inset 0 0 0 1px rgba(255,255,255,0.25);
+  transform: translateX(-50%) scale(1.05);
+}
+
+
+    /* ---------- GLOBAL ATMOSPHERE ---------- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at center, rgba(155,77,255,0.08), transparent 70%);
+  z-index: 1;
+}
+
+/* ===== CINEMATIC EXIT TRANSITION ===== */
+
+#intro.exit {
+  pointer-events: none;
+  animation: introExit 1.2s ease forwards;
+}
+
+@keyframes introExit {
+  0% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes coreExit {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+/* ===== PREMIUM CAMERA ASSIST FRAME (MATCHES REFERENCE) ===== */
+#edgeLight {
+  position: fixed;
+  inset: 18px;
+  pointer-events: none;
+  z-index: 7;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+
+  border-radius: 56px;
+  border: 36px solid rgba(255,255,255,0.98);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.85),
+    inset 0 0 28px rgba(0, 0, 0, 0.25);
+
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+  #loader {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: grid;
+  place-items: center;
+  z-index: 20;
+}
+
+#loader video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== WELCOME OVERLAY ===== */
+#welcomeLayer {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 0; /* behind UI, above background */
+}
+
+
+#welcomeText {
+  text-align: center;
+  opacity: 0;
+  transform: scale(1.6);
+  filter: blur(6px);
+  transition:
+    opacity 1.4s ease,
+    transform 1.4s ease,
+    filter 1.4s ease;
+}
+
+
+#welcomeText.show {
+  opacity: 0.85;
+  transform: scale(1.0);
+  filter: blur(0px);
+}
+
+
+#welcomeText.hide {
+  opacity: 0;
+  transform: scale(0.9);
+  filter: blur(10px);
+}
+
+
+.welcome-line {
+  font-size: 1.1rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 10px;
+}
+
+.welcome-name {
+  font-size: clamp(7rem, 16vw, 13rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  opacity: 0.65;
+
+  background: linear-gradient(
+    180deg,
+    rgba(230,220,255,0.95),
+    rgba(150,120,255,0.45)
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  text-shadow:
+    0 0 80px rgba(155,77,255,0.45);
+}
+
+.cinematic-profiles::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(155,77,255,0.12),
+      transparent 55%
+    );
+}
+
+
+/* ================= DEV PANEL ================= */
+#devPanel {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: 260px;
+  padding: 14px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #e6e6e6;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  z-index: 999;
+  display: none;
+  pointer-events: auto;
+}
+
+#devPanel.hidden {
+  pointer-events: none;
+}
+
+.dev-title {
+  font-weight: bold;
+  color: #9b4dff;
+  margin-bottom: 6px;
+}
+
+.dev-section {
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.dev-section b {
+  color: #c9b6ff;
+}
+
+
+
+#devGraph {
+  margin-top: 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+}
+
+/* ===== CINEMATIC PROFILE GATE ===== */
+
+.cinematic-profiles {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,0.06), transparent 60%),
+    rgba(0,0,0,0.92);
+  backdrop-filter: blur(14px);
+  z-index: 15;
+}
+
+.profile-title {
+  position: absolute;
+  top: 12%;
+  font-size: 0.75rem;
+  letter-spacing: 0.6em;
+  color: rgba(255,255,255,0.55);
+}
+
+/* ===== RAIL ===== */
+
+.profile-rail {
+  display: flex;
+  gap: 48px;
+  align-items: center;
+}
+
+/* ===== PROFILE ITEM ===== */
+
+.profile-item {
+  width: 180px;
+  text-align: center;
+  cursor: pointer;
+  transform: scale(0.9);
+  opacity: 0.55;
+  transition: all 0.45s ease;
+}
+
+.profile-item:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* focused look */
+.profile-item.selected {
+  transform: scale(1.18);
+  opacity: 1;
+}
+
+.profile-rail:hover .profile-item {
+  opacity: 0.35;
+  transform: scale(0.85);
+}
+
+.profile-rail:hover .profile-item:hover {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.cinematic-profiles {
+  transition: opacity 0.9s ease;
+}
+
+/* ===== CINEMATIC TRANSITION VEIL ===== */
+#transitionVeil {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(0,0,0,0.0),
+    rgba(0,0,0,0.85)
+  );
+  opacity: 0;
+  pointer-events: none;
+  z-index: 14;
+  transition: opacity 0.9s ease;
+}
+
+#transitionVeil.show {
+  opacity: 1;
+}
+
+/* ===== AVATAR ===== */
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #111;
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.85),
+    inset 0 0 0 1px rgba(255,255,255,0.15);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===== NAME ===== */
+
+.profile-name {
+  margin-top: 18px;
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  color: rgba(255,255,255,0.8);
+}
+
+
+/* ===== PROFILE CREATION : REDESIGN ===== */
+
+/* ================= AUTH MODAL ================= */
+
+.profile-modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 60;
+
+  background:
+    radial-gradient(circle at center, rgba(155,77,255,0.15), transparent 60%),
+    rgba(0,0,0,0.92);
+
+  backdrop-filter: blur(18px);
+}
+
+.profile-modal.hidden {
+  display: none;
+}
+
+.profile-modal-card {
+  width: 420px;
+  padding: 40px;
+  border-radius: 28px;
+  position: relative;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
+    rgba(14,12,20,0.96);
+
+  box-shadow:
+    0 50px 120px rgba(0,0,0,0.85),
+    inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+/* HEADER */
+.auth-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.auth-title {
+  font-size: 1.1rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #e8e2ff;
+  margin-bottom: 18px;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.auth-tab {
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.auth-tab.active {
+  background: linear-gradient(135deg, #9b4dff, #ffb86b);
+  color: #140b24;
+  border: none;
+}
+
+/* BODY */
+.auth-body label {
+  display: block;
+  margin-bottom: 18px;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+.auth-body input,
+.auth-body select {
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: none;
+  outline: none;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.auth-body input:focus,
+.auth-body select:focus {
+  box-shadow:
+    0 0 0 2px rgba(155,77,255,0.5),
+    0 0 20px rgba(155,77,255,0.35);
+}
+
+/* SUBMIT */
+.auth-submit {
+  width: 100%;
+  margin-top: 26px;
+  padding: 16px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+
+  --vibe-a: #9b4dff;
+  --vibe-b: #ffb86b;
+
+  background:
+    linear-gradient(120deg, var(--vibe-a), var(--vibe-b), var(--vibe-a));
+
+  background-size: 300% 300%;
+  animation: vibeWave 6s ease infinite;
+
+  color: #140b24;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+/*Pill Group Design*/
+.pill-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.pill {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+}
+
+.pill.active {
+  background: linear-gradient(135deg, #9b4dff, #ffb86b);
+  color: #1a0f2e;
+  border: none;
+}
+
+/* ================= EDIT MODE CANVAS ================= */
+
+#shapeEditor {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+
+#registerExtras {
+  overflow: hidden;
+  transition: all 0.35s ease;
+}
+
+#registerExtras.hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+  max-height: 0;
+  pointer-events: none;
+}
+
+#registerExtras.visible {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 500px;
+}
+
+
+/* ================= LOGIN TRANSITION ================= */
+
+.login-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at center,
+    rgba(155,77,255,0.25),
+    rgba(0,0,0,1)
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.login-transition.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.transition-core {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    #9b4dff,
+    #ffb86b
+  );
+  box-shadow:
+    0 0 60px rgba(155,77,255,0.8),
+    0 0 120px rgba(255,184,107,0.6);
+  animation: corePulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes corePulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.4);
+  }
+}
+
+
+/* Vibe selector */
+.devMoodBtn {
+  padding: 5px 10px;
+  font-size: 11px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: #1a0f2e;
+  color: #ddd;
+  cursor: pointer;
+}
+
+.devMoodBtn:hover {
+  background: #9b4dff;
+  color: #140b24;
+}
+
+
+  </style>
+</head>
+<body>
+
+
+<div id="loader">
+  <video id="loaderVideo"
+         src="loader2.mp4"
+         autoplay
+         muted
+         playsinline
+         loop></video>
+</div>
+
+<div id="edgeLight"></div>
+
+<div id="handStatus" class="lost">Hand not detected</div>
+
+<button id="logoutBtn"
+style="
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg,#9b4dff,#ffb86b);
+  color:#140b24;
+  font-size:12px;
+  cursor:pointer;
+  display:none;
+  z-index: 12;
+">
+  Logout
+</button>
+
+
+<canvas id="skeleton" width="300" height="300"></canvas>
+<canvas id="shapeEditor"></canvas>
+
+<video id="video" autoplay muted playsinline style="opacity:0; transform: scaleX(-1)"></video>
+
+
+<!-- ================= DEV OVERLAY (HIDDEN) ================= -->
+<div id="devPanel">
+  <div class="dev-title">DEV MODE</div>
+
+<button id="devProfileBtn"
+style="
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #222;
+  color: #ccc;
+">
+  TOGGLE PROFILE (DEV)
+</button>
+
+<button id="devShapeBtn"
+style="
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #1a0f2e;
+  color: #c9b6ff;
+">
+  NEXT SHAPE (DEV)
+</button>
+
+
+<button id="devEditBtn"
+style="
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #2b1d4a;
+  color: #ffddb0;
+">
+  TOGGLE EDIT MODE (DEV)
+</button>
+
+
+<button id="devGenerateBtn"
+style="
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #140b24;
+  color: #9bffd8;
+">
+  GENERATE SHAPE (DEV)
+</button>
+
+  <hr style="margin:10px 0; border-color: rgba(255,255,255,0.1);">
+
+  <div class="dev-section">
+  <b>Dev Mood Control</b>
+
+  <div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+    <button class="devMoodBtn" data-vibe="calm">Calm</button>
+    <button class="devMoodBtn" data-vibe="focused">Focused</button>
+    <button class="devMoodBtn" data-vibe="energetic">Energetic</button>
+    <button class="devMoodBtn" data-vibe="mystic">Mystic</button>
+  </div>
+</div>
+
+<div class="dev-section">
+  <b>Admin Controls</b>
+
+  <div style="margin:6px 0">
+    <label>
+      <input type="checkbox" id="devAdminToggle">
+      Force Admin Mode
+    </label>
+  </div>
+
+  <div style="margin-top:8px">
+  Morph Speed: <span id="devMorphVal">1.00</span>
+  <input type="range" id="devMorph" min="0.5" max="2" step="0.05" value="1">
+</div>
+
+
+  <div>
+    Glow Boost
+    <input type="range" id="devGlow" min="0.5" max="2" step="0.05" value="1">
+  </div>
+
+  <div>
+    Motion Damp
+    <input type="range" id="devMotion" min="0.5" max="2" step="0.05" value="1">
+  </div>
+
+  <div>
+    Breathe Speed
+    <input type="range" id="devBreathe" min="0.5" max="2" step="0.05" value="1">
+  </div>
+
+</div>
+
+  <button id="devResetAdmin"
+style="
+  width:100%;
+  margin-top:8px;
+  padding:6px;
+  border-radius:6px;
+  border:none;
+  background:#111;
+  color:#ff6a6a;
+">
+  RESET ADMIN OVERRIDES
+</button>
+
+
+
+  <div class="dev-section">
+    <b>Rendering</b>
+    <div>FPS: <span id="dev-fps">–</span></div>
+    <div>Frame time: <span id="dev-ms">–</span> ms</div>
+    <div>Particles: <span id="dev-particles">–</span></div>
+    <div>Shape: <span id="dev-shape">–</span></div>
+    <div>Profile: <span id="dev-profile">–</span></div>
+    <canvas id="devGraph" width="230" height="50"></canvas>
+  </div>
+
+  <div style="margin-top:6px">
+  Frame Load:
+  <div style="background:#222;height:6px;border-radius:3px;overflow:hidden">
+    <div id="dev-heat"
+         style="height:100%;width:0%;background:#9b4dff"></div>
+  </div>
+</div>
+
+
+  <div class="dev-section">
+    <b>Hands</b>
+    <div>Hands detected: <span id="dev-hands">–</span></div>
+    <div>Openness: <span id="dev-open">–</span></div>
+    <div>Depth: <span id="dev-depth">–</span></div>
+  </div>
+
+  <div class="dev-section">
+    <b>Performance</b>
+    <div>perfLevel: <span id="dev-perf">–</span></div>
+    <div>Tier: <span id="dev-tier">–</span></div>
+    <div>Edge Perf: <span id="dev-edge">–</span></div>
+    <div>Runtime locked: <span id="dev-lock">–</span></div>
+  </div>
+
+  <div class="dev-section">
+  <b>Edge / Ambient</b>
+  <div>Ambient: <span id="dev-ambient">–</span></div>
+  <div>DarkState: <span id="dev-dark">–</span></div>
+  </div>
+
+</div>
+
+<div id="intro">
+  <video id="introVideo"
+         src="intro.mp4"
+         autoplay
+         muted
+         playsinline
+         loop></video>
+</div>
+
+<div id="welcomeLayer">
+  <div id="welcomeText">
+    <div class="welcome-line">Welcome</div>
+    <div class="welcome-name"></div>
+  </div>
+</div>
+
+<div id="transitionVeil"></div>
+
+<div id="gestureHint" style="
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+padding:10px 22px;
+border-radius:20px;
+background:rgba(0,0,0,0.6);
+color:#ccc;
+font-size:12px;
+letter-spacing:1px;
+z-index:15;
+opacity:0;
+transition:opacity 0.6s ease;
+pointer-events:none;
+">
+Move your hand to rotate · Open palm to scale · Two hands to switch shapes
+</div>
+
+<!-- ===== CREATE PROFILE MODAL ===== -->
+
+<!-- ===== AUTH MODAL ===== -->
+<div id="createProfileModal" class="profile-modal hidden">
+  <form class="profile-modal-card" autocomplete="off">
+
+    <input type="text" style="display:none">
+    <input type="password" style="display:none">
+
+    <div class="auth-header">
+      <div class="auth-title">Orbital Access</div>
+      <div class="auth-tabs">
+        <button class="auth-tab" data-mode="register">Register</button>
+        <button class="auth-tab active" data-mode="login">Login</button>
+      </div>
+    </form>
+
+    <div class="auth-body">
+
+      <label>
+        Username
+        <input 
+      id="newProfileName" 
+      placeholder="Enter username" 
+      autocomplete="new-password"
+/>
+      </label>
+
+      <label>
+        Password
+        <input 
+        id="newProfilePassword" 
+        type="password" 
+        placeholder="Enter password"
+        autocomplete="new-password"
+      />
+      </label>
+
+      <div id="registerExtras">
+
+        <label>
+          Gender
+          <select id="newProfileGender">
+            <option value="neutral">Neutral</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </label>
+
+        <label>
+          Vibe
+          <div class="pill-group" id="vibeGroup">
+            <button class="pill active" data-vibe="calm">Calm</button>
+            <button class="pill" data-vibe="focused">Focused</button>
+            <button class="pill" data-vibe="energetic">Energetic</button>
+            <button class="pill" data-vibe="mystic">Mystic</button>
+          </div>
+        </label>
+
+      </div>
+
+      <button id="authSubmitBtn" class="auth-submit">
+        Enter
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+<div id="loginTransition" class="login-transition hidden">
+  <div class="transition-core"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script src="config.js"></script>
+
+<script>
+
+function assertRuntimeUnlocked() {
+  return !runtimeLocked;
+}
+
+
+function showIntro() {
+  const intro = document.getElementById('intro');
+  const video = document.getElementById('introVideo');
+
+  intro.style.display = 'block';
+  video.pause();
+  video.currentTime = 0;
+  video.play().catch(() => {});
+}
+
+function showWelcomeMessage(username) {
+
+  if (!animationRunning) {
+  animationRunning = true;
+  lastFrameTime = performance.now();
+  animate();
+}
+
+  const layer = document.getElementById('welcomeLayer');
+  const text = document.getElementById('welcomeText');
+  const nameEl = text.querySelector('.welcome-name');
+
+  nameEl.textContent = username.toUpperCase();
+
+// Apply vibe gradient to welcome name
+const vibe = window.ACTIVE_VIBE || "calm";
+const [c1, c2] = VIBE_COLORS[vibe] || VIBE_COLORS["calm"];
+
+nameEl.style.background = `
+  linear-gradient(
+    180deg,
+    ${c2},
+    ${c1}
+  )
+`;
+
+nameEl.style.webkitBackgroundClip = "text";
+nameEl.style.webkitTextFillColor = "transparent";
+nameEl.style.textShadow = `0 0 80px ${c1}`;
+
+  text.classList.remove('show', 'hide');
+
+  requestAnimationFrame(() => {
+    text.classList.add('show');
+  });
+
+  setTimeout(() => {
+  text.classList.add('hide');
+
+  // 🔓 START PARTICLES WHILE TEXT FADES
+  visualsReady = true;
+  renderer.domElement.style.opacity = "1";
+  renderer.render(scene, camera);
+}, 2400);
+
+setTimeout(() => {
+  layer.remove();
+}, 4200);
+
+}
+
+
+// ==================== THREE SETUP ====================
+
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 130;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+renderer.setClearColor(0x000000, 1);
+
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+
+renderer.domElement.style.opacity = "0";
+renderer.domElement.style.pointerEvents = "none";
+renderer.domElement.style.transition = "opacity 1.2s ease";
+renderer.domElement.style.display = 'block';
+
+
+scene.add(new THREE.AmbientLight(0x552266, 0.4));
+const dirLight = new THREE.DirectionalLight(0xbb88ff, 1.1);
+dirLight.position.set(1, 1, 1);
+scene.add(dirLight);
+
+
+  async function benchmarkParticles(renderer, scene, camera) {
+  const testSteps = [10000, 16000, 22000, 28000];
+  let best = testSteps[0];
+
+  const geo = new THREE.BufferGeometry();
+  const mat = new THREE.PointsMaterial({ size: 1 });
+
+  for (const count of testSteps) {
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count * 3; i++) {
+      pos[i] = (Math.random() - 0.5) * 100;
+    }
+
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const pts = new THREE.Points(geo, mat);
+    scene.add(pts);
+
+    // warmup
+    for (let i = 0; i < 10; i++) renderer.render(scene, camera);
+
+    let worst = 0;
+    let sum = 0;
+    const frames = 12;
+
+    for (let i = 0; i < frames; i++) {
+      const t0 = performance.now();
+      renderer.render(scene, camera);
+      const dt = performance.now() - t0;
+      sum += dt;
+      worst = Math.max(worst, dt);
+    }
+
+    scene.remove(pts);
+    geo.dispose();
+    mat.dispose();
+
+
+    const avg = sum / frames;
+
+    if (avg > 20 || worst > 30) break;
+    best = count;
+  }
+
+  return Math.floor(best * 0.85); // safety margin
+}
+
+
+let lastRotX = 0;
+let lastRotY = 0;
+let lastRotZ = 0;
+
+const SHAPES = ['sphere', 'infinity', 'heart', 'saturn', 'spiral', 'butterfly'];
+
+
+//================== Global Variables ================
+let experienceStarted = false;
+let runtimeLocked = false;
+let currentShapeIndex = 0;
+let previousShapeIndex = 0;
+let lastTwoHandDistance = null;
+let twoHandCooldown = false;
+let isMorphing = false;
+let normalsDirty = false;
+const MORPH_EPSILON = 0.002;
+let twoHandArmed = false;
+let twoHandStartTime = 0;
+let rawDepth = 0;
+let baseHandSize = null;
+let handSize = 0;
+let saturnRingStart = 0;
+let saturnRingCount = 0;
+let ringAngle = 0;
+const GAP_FADE_START = 42;
+const GAP_FADE_END   = 48;
+let saturnRingBase = null;
+let midColor = new THREE.Color();
+let highlightColor = new THREE.Color();
+
+//Spiral animation Constants
+let spiralBase = null;
+let spiralPhase = 0;
+let spiralCorePhase = 0;
+
+
+// light hit
+let handDepth = 0;
+let gestureAccum = 0;
+const GESTURE_THRESHOLD = 0.045;
+let lastTier = null;
+let butterflyTime = 0;
+
+
+const TWO_HAND_ARM_DELAY = 250; // ms
+let shapeTextureBias = {
+  size: 1.35,
+  alpha: 0.25
+};
+let colorUpdateCooldown = 0;
+let colorFrameSkip = 0;
+
+let smoothedLandmarks = null;
+const LANDMARK_SMOOTH = 0.65; // higher = smoother, lower = snappier
+let isLocked = false;
+let lockProgress = 0;          // 0 → 1
+
+const LOCK_PROGRESS_SPEED = 0.0042;   // faster lock/unlock
+const LOCK_DECAY_SPEED = 0.0012;      // slower decay (stability)
+let frozenRotX = 0;
+let frozenRotY = 0;
+let frozenRotZ = 0;
+let frozenScale = 1;
+let frozenDepth = 0;
+let depthFactor = 0;
+let lockRing = null;
+let lockRingMaterial = null;
+let lastShapeSwitchTime = 0;
+const SHAPE_SWITCH_COOLDOWN_MS = 500;
+let stableHands = {
+  left: null,
+  right: null
+};
+const HAND_SMOOTH = 0.75; // 0.6 = snappy, 0.8 = very smooth
+let smoothTwoHandDist = null;
+let lastTwoHandOpenness = null;
+
+let smoothOpennessDelta = 0;
+let closingIntentStart = null;
+let openingIntentStart = null;
+let darkState = false;
+let handStableSince = null;
+let edgeLightPerfMode = false;
+let edgeLightActive = false;
+const PERF_ON_OPACITY  = 0.7;
+const PERF_OFF_OPACITY = 0.3;
+let smoothedEdgeOpacity = 0;
+let smoothedAmbient = 1;
+const EDGE_OPACITY_SEARCH  = 1.0;  // no hands
+const EDGE_OPACITY_ACQUIRE = 0.65; // hands just appeared
+const EDGE_OPACITY_TRACK   = 0.25; // hands stable
+const HAND_STABLE_TIME = 600; // ms
+const edgeLightEl = document.getElementById('edgeLight');
+let galaxyTick = 0;
+let loaderVideoFinished = false;
+let systemReady = false;
+let devMode = false;
+let devForceProfile = null; // null | 'FULL' | 'EDGE'
+let fps = 0;
+let fpsFrames = 0;
+let fpsLastTime = performance.now();
+const graphCanvas = document.getElementById('devGraph');
+const graphCtx = graphCanvas.getContext('2d');
+
+const GRAPH_POINTS = 60;
+let fpsHistory = new Array(GRAPH_POINTS).fill(60);
+
+let lastGraphUpdate = performance.now();
+const GRAPH_UPDATE_INTERVAL = 250; // ms (4 times/sec)
+let lastDevUpdate = 0;
+const DEV_UPDATE_INTERVAL = GRAPH_UPDATE_INTERVAL;
+let lastHandCount = 0;
+let lastHandSeenTime = performance.now();
+const HAND_LOSS_GRACE_MS = 120;
+let selectedVibe = "calm";
+const BASE_SCALE = 1.75;
+const tempColor = new THREE.Color();
+
+
+// ================= DUAL STILLNESS EDIT GESTURE =================
+let dualStillActive = false;
+let dualStillStart = 0;
+let dualStillCooldownUntil = 0;
+
+const DUAL_OPEN_THRESHOLD = 0.75;
+const DUAL_CLOSED_THRESHOLD = 0.25;
+const DUAL_HOLD_TIME = 900;        // ms
+const DUAL_MOVE_THRESHOLD = 0.0025;
+
+
+
+// ================= APP MODE SYSTEM =================
+const APP_MODE = {
+  VIEW: "view",
+  EDIT: "edit"
+};
+
+let currentMode = APP_MODE.VIEW;
+let savedParticleSize = null;
+let customMorphBoost = 1;
+let customShapeActive = false;
+
+let vibeSettings = {
+  morphSpeed: 1,
+  motionDamp: 1,
+  glowBoost: 1,
+  colorShift: 0,
+  breatheSpeed: 1,
+  depthSoftness: 1
+};
+
+
+const VIBE_COLORS = {
+  calm:      ["#6fa8ff", "#b6e0ff"],   // cool blue → sky
+  focused:   ["#3dffd0", "#8bffe8"],   // mint → cyan
+  energetic: ["#ff6a00", "#ffcf4a"],   // hot orange → yellow
+  mystic:    ["#7b3cff", "#ff6fd8"]    // violet → magenta
+};
+
+// ===== SHAPE COLOR PROFILES =====
+const SHAPE_COLORS = {
+  sphere: {
+    mid: new THREE.Color('#6a3cff'),
+    highlight: new THREE.Color('#c9b6ff')
+  },
+  infinity: {
+    mid: new THREE.Color('#00ffd5'),
+    highlight: new THREE.Color('#bafff3')
+  },
+  heart: {
+    mid: new THREE.Color('#ff3b6f'),
+    highlight: new THREE.Color('#ffd1dc')
+  },
+  saturn: {
+    mid: new THREE.Color('#ffb86b'),
+    highlight: new THREE.Color('#fff1c1')
+  },
+  butterfly: {
+  mid: new THREE.Color('#ff6fd8'),
+  highlight: new THREE.Color('#ffe3ff')
+},
+spiral: {
+  mid: new THREE.Color('#ffffff'),
+  highlight: new THREE.Color('#ffffff')
+},
+
+
+};
+
+// ================= PERFORMANCE GOVERNOR =================
+let lastFrameTime = performance.now();
+let avgFrameTime = 16.6; // ms
+let perfLevel = 1.0;     // 1 = full, 0.7 = reduced, 0.5 = survival
+
+function updatePerfLevel(dt) {
+  avgFrameTime = avgFrameTime * 0.9 + dt * 0.1;
+
+  if (avgFrameTime > 24)      perfLevel = 0.5;
+  else if (avgFrameTime > 20) perfLevel = 0.7;
+  else                        perfLevel = 1.0;
+}
+
+// ==================== PLAN B : SIMULATION TIERS ====================
+const SIMULATION_TIER = {
+  FULL: 0,
+  REDUCED: 1,
+  IDLE: 2
+};
+
+let currentTier = SIMULATION_TIER.FULL;
+
+
+// ==================== PLAN B : TIER DECISION ====================
+function updateSimulationTier() {
+  if (!experienceStarted) {
+    currentTier = SIMULATION_TIER.IDLE;
+    return;
+  }
+
+  if (edgeLightActive || perfLevel < 0.8) {
+    currentTier = SIMULATION_TIER.REDUCED;
+    return;
+  }
+
+  currentTier = SIMULATION_TIER.FULL;
+}
+
+
+let ambientLightLevel = 1;
+
+// ==================== PARTICLES ====================
+let MAX_PARTICLES = 24000;
+let effectiveParticleCount = MAX_PARTICLES;
+
+let galaxyBase = null;
+let galaxyPhase = null;
+
+
+const geometry = new THREE.BufferGeometry();
+const positions = new Float32Array(MAX_PARTICLES * 3);
+const targetPositions = new Float32Array(MAX_PARTICLES * 3);
+const normals = new Float32Array(MAX_PARTICLES * 3);
+const baseColor = new THREE.Color('#6a0dad');
+const lightDir = new THREE.Vector3(1, 0.6, 0.8).normalize();
+
+
+function generateInfinity() {
+  const a = 30;
+
+  for (let i = 0; i < effectiveParticleCount; i++) {
+    const t = Math.random() * Math.PI * 2;
+
+    // ---- ORIGINAL CENTER CURVE (UNCHANGED) ----
+    const cx = a * Math.sin(t);
+    const cz = a * Math.sin(t) * Math.cos(t);
+
+    // ---- CURVED VERTICAL LIFT (FIXED) ----
+    // replaces flat Math.sin(t * 2)
+    const curveLift = Math.sin(t) * Math.cos(t);
+    const cy = curveLift * 18;
+
+    // ---- TRUE CIRCULAR TUBE ----
+    const tubeR = 4 * Math.sqrt(Math.random());
+    const tubeAngle = Math.random() * Math.PI * 2;
+
+    // perpendicular direction (stable)
+    const dx = a * Math.cos(t);
+    const dz = a * (Math.cos(t) * Math.cos(t) - Math.sin(t) * Math.sin(t));
+    const len = Math.hypot(dx, dz) || 1;
+
+    const px = -dz / len;
+    const pz = dx / len;
+
+    const x = cx + px * Math.cos(tubeAngle) * tubeR;
+    const y = cy + Math.sin(tubeAngle) * tubeR;
+    const z = cz + pz * Math.cos(tubeAngle) * tubeR;
+
+    const scale = 1.6;
+
+    targetPositions[i * 3]     = x * scale;
+    targetPositions[i * 3 + 1] = y * scale;
+    targetPositions[i * 3 + 2] = z * scale;
+  }
+}
+
+
+
+function generateHeart() {
+  const scale = 2.3;
+
+  for (let i = 0; i < effectiveParticleCount; i++) {
+    const t = Math.random() * Math.PI * 2;
+
+    // Balanced bias: outline + volume
+    const bias = Math.pow(Math.random(), 0.5);
+
+    // Classic heart curve
+    const hx =
+      16 * Math.pow(Math.sin(t), 3);
+
+    const hy =
+      13 * Math.cos(t)
+      - 5 * Math.cos(2 * t)
+      - 2 * Math.cos(3 * t)
+      - Math.cos(4 * t);
+
+    // Partial hollow (NOT empty)
+    const fill = THREE.MathUtils.lerp(0.6, 1.0, bias);
+
+    const x = hx * fill * scale;
+    const y = hy * fill * scale;
+
+    // 👉 THIS is the thickness fix
+    const z =
+      (Math.random() - 0.5) *
+      THREE.MathUtils.lerp(6.0, 12.0, bias);
+
+    targetPositions[i * 3]     = x;
+    targetPositions[i * 3 + 1] = y;
+    targetPositions[i * 3 + 2] = z;
+  }
+}
+
+
+
+function generateSaturn() {
+  const activeCount = effectiveParticleCount;
+  const coreCount = Math.floor(activeCount * 0.55);
+  saturnRingStart = coreCount;
+  saturnRingCount = activeCount - coreCount;
+
+
+  // ---------- HALF-SPHERE CORE ----------
+  for (let i = 0; i < coreCount; i++) {
+    const u = Math.random();
+    const v = Math.random();
+
+    const theta = 2 * Math.PI * u;
+    const phi = Math.acos(2 * v - 1);
+
+    const radius = 28 + (Math.random() - 0.5) * 1.0;
+
+    let x = radius * Math.sin(phi) * Math.cos(theta);
+    const y = radius * Math.cos(phi);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+
+    if (x < 0) x *= -1; // clean hemisphere cut
+
+    targetPositions[i * 3]     = x;
+    targetPositions[i * 3 + 1] = y;
+    targetPositions[i * 3 + 2] = z;
+  }
+
+  // ---------- RINGS ----------
+  for (let i = 0; i < saturnRingCount; i++) {
+    const idx = coreCount + i;
+    const angle = Math.random() * Math.PI * 2;
+
+    const inner = 42;
+    const outer = 64;
+
+    const radius =
+      inner + Math.pow(Math.random(), 1.6) * (outer - inner);
+
+    const band = Math.sin(radius * 0.45) * 1.2;
+    const finalRadius = radius + band;
+
+    const thickness = (Math.random() - 0.5) * 0.8;
+
+    targetPositions[idx * 3]     = finalRadius * Math.cos(angle);
+    targetPositions[idx * 3 + 1] = thickness;
+    targetPositions[idx * 3 + 2] = finalRadius * Math.sin(angle);
+  }
+
+  // ---------- STORE BASE RING POSITIONS ----------
+  saturnRingBase = new Float32Array(saturnRingCount * 2);
+
+  for (let i = 0; i < saturnRingCount; i++) {
+    const idx = saturnRingStart + i;
+    saturnRingBase[i * 2]     = targetPositions[idx * 3];
+    saturnRingBase[i * 2 + 1] = targetPositions[idx * 3 + 2];
+  }
+}
+
+
+function generateSpiral() {
+
+  const arms = 4;
+  const radiusMax = 95;
+  const spin = 2.8;
+  const armSpread = 0.18;     // smaller = cleaner arms
+  const coreRadius = 20;
+
+  for (let i = 0; i < effectiveParticleCount; i++) {
+
+    const r = Math.pow(Math.random(), 1.5) * radiusMax;
+
+    const armIndex = Math.floor(Math.random() * arms);
+    const armOffset = (armIndex / arms) * Math.PI * 2;
+
+    const angle =
+      armOffset +
+      r * 0.045 * spin +
+      (Math.random() - 0.5) * armSpread;
+
+    let x = Math.cos(angle) * r;
+    let z = Math.sin(angle) * r;
+
+    // Dense clean core
+    if (r < coreRadius) {
+      x *= 0.55;
+      z *= 0.55;
+    }
+
+    const y =
+      (Math.random() - 0.5) *
+      THREE.MathUtils.lerp(18, 4, r / radiusMax);
+
+    targetPositions[i * 3]     = x;
+    targetPositions[i * 3 + 1] = y;
+    targetPositions[i * 3 + 2] = z;
+  }
+  // store clean base
+spiralBase = new Float32Array(targetPositions);
+
+}
+
+function createBackgroundStars() {
+
+  const starGeo = new THREE.BufferGeometry();
+  const starCount = 2000;
+  const starPos = new Float32Array(starCount * 3);
+
+  for (let i = 0; i < starCount; i++) {
+    starPos[i * 3]     = (Math.random() - 0.5) * 2000;
+    starPos[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+    starPos[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+  }
+
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+
+  const starMat = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 1,
+    transparent: true,
+    opacity: 0.3
+  });
+
+  const stars = new THREE.Points(starGeo, starMat);
+  scene.add(stars);
+}
+
+createBackgroundStars();
+
+
+
+function generateButterfly() {
+
+  const scale = 6.5;
+
+  for (let i = 0; i < effectiveParticleCount; i++) {
+
+    const t = Math.random() * Math.PI * 2;
+
+    // classic butterfly curve
+    const r =
+      Math.exp(Math.cos(t))
+      - 2 * Math.cos(4 * t)
+      + Math.pow(Math.sin(t / 12), 5);
+
+    const x = Math.sin(t) * r * scale;
+    const y = Math.cos(t) * r * scale;
+
+    // depth thickness (wing body separation)
+    const depth =
+      (Math.random() - 0.5) *
+      THREE.MathUtils.lerp(22, 6, Math.abs(Math.sin(t)));
+
+    targetPositions[i * 3]     = x;
+    targetPositions[i * 3 + 1] = y * 1.25;
+    targetPositions[i * 3 + 2] = depth;
+  }
+}
+
+
+
+function generateSphere() {
+  const radius = 45;
+
+  for (let i = 0; i < effectiveParticleCount; i++) {
+    // uniform surface distribution
+    const u = Math.random();
+    const v = Math.random();
+
+    const theta = 2 * Math.PI * u;
+    const phi   = Math.acos(1 - 2 * v);
+
+    // slight surface noise (organic, not blobby)
+    const r = radius + (Math.random() - 0.5) * 1.2;
+
+    targetPositions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+    targetPositions[i * 3 + 1] = r * Math.cos(phi);
+    targetPositions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+  }
+}
+
+
+//==============================Shapes ENDS=================================
+
+
+function switchShape(dir) {
+  if (isMorphing) return;
+
+  previousShapeIndex = currentShapeIndex;
+  customShapeActive = false;
+  // clear transient gesture memory (safe, deterministic)
+  gestureAccum = 0;
+  lastTwoHandDistance = null;
+  lastTwoHandOpenness = null;
+  closingIntentStart = null;
+  openingIntentStart = null;
+
+  // arm a short cooldown to avoid an accidental immediate flip
+  twoHandCooldown = true;
+  lastShapeSwitchTime = performance.now();
+
+  currentShapeIndex =
+  (currentShapeIndex + dir + SHAPES.length) % SHAPES.length;
+
+// ✅ DEFINE SHAPE (MISSING — THIS CAUSED CRASH)
+const shape = SHAPES[currentShapeIndex];
+
+// ===== APPLY SHAPE COLOR PROFILE =====
+const profile = SHAPE_COLORS[shape];
+if (profile) {
+  midColor.copy(profile.mid);
+  highlightColor.copy(profile.highlight);
+  material.uniforms.uMidColor.value.copy(profile.mid);
+  material.uniforms.uHighlightColor.value.copy(profile.highlight);
+
+} 
+
+  // ----- RESET SATURN STATE WHEN LEAVING IT -----
+if (shape !== 'saturn') {
+  saturnRingStart = 0;
+  saturnRingCount = 0;
+  saturnRingBase = null;
+  ringAngle = 0;
+}
+
+
+  // ---- Shape geometry ----
+  if (shape === 'sphere') generateSphere();
+  if (shape === 'infinity') generateInfinity();
+  if (shape === 'heart') generateHeart();
+  if (shape === 'saturn') generateSaturn();
+  if (shape === 'spiral') generateSpiral();
+  if (shape === 'butterfly') generateButterfly();
+
+
+
+  // ---- Texture bias per shape ----
+  if (shape === 'sphere') {
+    shapeTextureBias.size = 1.3;
+    shapeTextureBias.alpha = 0.22;
+  } else if (shape === 'infinity') {
+    shapeTextureBias.size = 1.35;
+    shapeTextureBias.alpha = 0.26;
+  } else if (shape === 'heart') {
+    shapeTextureBias.size = 1.45;
+    shapeTextureBias.alpha = 0.2;
+  } else if (shape === 'saturn') {
+    shapeTextureBias.size = 1.25;
+    shapeTextureBias.alpha = 0.32;
+  }
+
+  isMorphing = true;
+  normalsDirty = true;
+
+  particles.rotation.set(0, 0, 0);
+
+  camera.position.x = 0;
+  camera.position.y = 0;
+  camera.position.z = 130;
+
+
+  lastRotX = particles.rotation.x;
+  lastRotY = particles.rotation.y;
+  lastRotZ = particles.rotation.z;
+
+  // Face butterfly toward camera
+if (shape === 'butterfly') {
+  particles.rotation.y = Math.PI / 2;
+}
+
+
+}
+
+function regenerateCurrentProceduralShape() {
+
+  const shape = SHAPES[currentShapeIndex];
+
+  if (shape === 'sphere') generateSphere();
+  if (shape === 'infinity') generateInfinity();
+  if (shape === 'heart') generateHeart();
+  if (shape === 'saturn') generateSaturn();
+  if (shape === 'spiral') generateSpiral();
+  if (shape === 'butterfly') generateButterfly();
+
+
+  isMorphing = true;
+  normalsDirty = true;
+}
+
+
+
+//MOrph function
+function recomputeNormals() {
+  for (let i = 0; i < effectiveParticleCount; i++) {
+    const x = positions[i * 3];
+    const y = positions[i * 3 + 1];
+    const z = positions[i * 3 + 2];
+
+    const len = Math.sqrt(x*x + y*y + z*z) || 1;
+
+    normals[i * 3]     = x / len;
+    normals[i * 3 + 1] = y / len;
+    normals[i * 3 + 2] = z / len;
+  }
+
+  geometry.attributes.normal.needsUpdate = true;
+}
+
+// Attach attributes FIRST
+geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+
+// IMPORTANT: ensure geometry renders before boot profile adjustment
+geometry.setDrawRange(0, MAX_PARTICLES);
+
+// Generate initial shape
+generateSphere();
+positions.set(targetPositions);
+
+// Now tell GPU
+geometry.attributes.position.needsUpdate = true;
+geometry.computeBoundingSphere();
+recomputeNormals();
+
+
+const spriteCanvas = document.createElement('canvas');
+spriteCanvas.width = spriteCanvas.height = 64;
+const ctx = spriteCanvas.getContext('2d');
+
+// ==================== PARTICLE SPRITE (UPGRADED) ====================
+// Goal:
+// - Dense dark core
+// - Sharp energy ring
+// - Soft asymmetric halo
+// - Cleaner zoom behavior
+
+const grad = ctx.createRadialGradient(32, 32, 4, 32, 32, 28);
+
+// Core: darker, denser
+grad.addColorStop(0.0, 'rgba(140,90,220,0.18)');
+grad.addColorStop(0.18, 'rgba(160,110,240,0.25)');
+
+// Energy ring: sharper presence
+grad.addColorStop(0.42, 'rgba(210,170,255,0.55)');
+grad.addColorStop(0.55, 'rgba(230,190,255,0.9)');
+
+// Halo falloff: faster, cleaner
+grad.addColorStop(0.75, 'rgba(180,130,255,0.25)');
+grad.addColorStop(1.0, 'rgba(255,255,255,0)');
+
+ctx.clearRect(0, 0, 64, 64);
+ctx.fillStyle = grad;
+ctx.fillRect(0, 0, 64, 64);
+
+
+const texture = new THREE.CanvasTexture(spriteCanvas);
+
+const material = new THREE.ShaderMaterial({
+
+  uniforms: {
+    uTexture: { value: texture },
+    uLightDir: { value: new THREE.Vector3(1, 0.6, 0.8).normalize() },
+    uMidColor: { value: new THREE.Color('#6a3cff') },
+    uHighlightColor: { value: new THREE.Color('#c9b6ff') },
+    uTime: { value: 0 },
+    uSize: { value: 2.0 },
+    uGlowBoost: { value: 1.0 }
+    
+  },
+
+  vertexShader: `
+    
+    uniform float uTime;
+    uniform float uSize;
+
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    void main() {
+
+      vNormal = normalize(normal);
+      vPosition = position;
+
+      vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+
+      gl_PointSize = uSize * (300.0 / -mvPosition.z);
+
+      gl_Position = projectionMatrix * mvPosition;
+    }
+
+  `,
+
+  fragmentShader: `
+    uniform sampler2D uTexture;
+    uniform vec3 uLightDir;
+    uniform vec3 uMidColor;
+    uniform vec3 uHighlightColor;
+    uniform float uGlowBoost;
+
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    void main() {
+
+      vec4 tex = texture2D(uTexture, gl_PointCoord);
+      if (tex.a < 0.1) discard;
+
+      float lightFactor = max(dot(normalize(vNormal), normalize(uLightDir)), 0.0);
+
+      float vertical = clamp((vPosition.y + 40.0) / 80.0, 0.0, 1.0);
+      float radial = clamp(1.0 - length(vPosition.xz) / 70.0, 0.0, 1.0);
+
+      vec3 color = mix(uMidColor, uHighlightColor, lightFactor);
+      color *= mix(0.6, 1.2, vertical * 0.6 + radial * 0.4);
+
+      float rim = pow(1.0 - lightFactor, 2.0) * 0.15;
+      color += rim;
+
+      float depthFade = smoothstep(150.0, 0.0, length(vPosition));
+      float coreBoost = smoothstep(40.0, 0.0, length(vPosition)) * 0.6;
+      color += coreBoost;
+      color *= depthFade;
+
+      gl_FragColor = vec4(color, tex.a * 0.55 * uGlowBoost);
+
+    }
+  `,
+
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.NormalBlending
+
+});
+
+texture.magFilter = THREE.NearestFilter;
+texture.generateMipmaps = false;
+
+
+function createLockRing() {
+  const segments = 64;
+  const radius = 75; // slightly larger than max shape
+
+  const points = [];
+  for (let i = 0; i <= segments; i++) {
+    const angle = (i / segments) * Math.PI * 2;
+    points.push(
+      new THREE.Vector3(
+        Math.cos(angle) * radius,
+        Math.sin(angle) * radius,
+        0
+      )
+    );
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+  lockRingMaterial = new THREE.LineBasicMaterial({
+    color: 0xf3d7a6,   // soft gold
+    transparent: true,
+    opacity: 0.0
+  });
+
+  lockRing = new THREE.Line(geometry, lockRingMaterial);
+  lockRing.rotation.x = Math.PI / 2; // face camera-ish
+  scene.add(lockRing);
+}
+
+
+const particles = new THREE.Points(geometry, material);
+scene.add(particles);
+
+createLockRing();
+
+// ==================== HAND TRACKING ====================
+const videoElement = document.getElementById('video');
+const skelCanvas = document.getElementById('skeleton');
+const handStatusEl = document.getElementById('handStatus');
+
+// ================= EDITOR CANVAS SETUP =================
+const editorCanvas = document.getElementById("shapeEditor");
+const editorCtx = editorCanvas.getContext("2d");
+
+function resizeEditor() {
+  editorCanvas.width = window.innerWidth;
+  editorCanvas.height = window.innerHeight;
+}
+
+resizeEditor();
+window.addEventListener("resize", resizeEditor);
+
+
+const skelCtx = skelCanvas.getContext('2d');
+
+let rawHandX = 0, rawHandY = 0, rawOpenness = 0, rawRoll = 0;
+let handX = 0, handY = 0, handOpenness = 0, handRoll = 0;
+let cameraStarted = false;
+
+//Edge brightness Globals
+
+const DARK_ON  = 0.26; // turn ON below this
+const DARK_OFF = 0.32; // turn OFF above this
+
+let lastAmbientSample = 0;
+
+const AMBIENT_SAMPLE_INTERVAL = 500;
+
+let lastHandSeen = performance.now();
+
+let calibrating = true;
+let calibStart = performance.now();
+let openMinDyn = Infinity;
+let openMaxDyn = -Infinity;
+
+const ROTATE_SMOOTH = 0.22;
+const OPEN_MIN_FALLBACK = 0.9;
+const OPEN_MAX_FALLBACK = 1.8;
+
+const HAND_CONNECTIONS = [
+  [0,1],[1,2],[2,3],[3,4],
+  [0,5],[5,6],[6,7],[7,8],
+  [0,9],[9,10],[10,11],[11,12],
+  [0,13],[13,14],[14,15],[15,16],
+  [0,17],[17,18],[18,19],[19,20]
+];
+
+const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
+hands.setOptions({
+  maxNumHands: 2,
+  modelComplexity: 1,
+  minDetectionConfidence: 0.7,
+  minTrackingConfidence: 0.7
+});
+
+function drawHand(lm) {
+  skelCtx.lineWidth = 2;
+  skelCtx.strokeStyle = calibrating ? '#888' : '#9b4dff';
+  skelCtx.fillStyle = '#cfa6ff';
+
+  const w = skelCanvas.width;
+  const h = skelCanvas.height;
+
+  for (const [a, b] of HAND_CONNECTIONS) {
+    skelCtx.beginPath();
+    skelCtx.moveTo((1 - lm[a].x) * w, lm[a].y * h);
+    skelCtx.lineTo((1 - lm[b].x) * w, lm[b].y * h);
+    skelCtx.stroke();
+  }
+
+  for (const p of lm) {
+    skelCtx.beginPath();
+    skelCtx.arc((1 - p.x) * w, p.y * h, 4, 0, Math.PI * 2);
+    skelCtx.fill();
+  }
+}
+
+
+function smoothLandmarks(rawLm) {
+  if (!smoothedLandmarks) {
+    // first frame → clone
+    smoothedLandmarks = rawLm.map(p => ({ ...p }));
+    return smoothedLandmarks;
+  }
+
+  for (let i = 0; i < rawLm.length; i++) {
+    smoothedLandmarks[i].x += (rawLm[i].x - smoothedLandmarks[i].x) * (1 - LANDMARK_SMOOTH);
+    smoothedLandmarks[i].y += (rawLm[i].y - smoothedLandmarks[i].y) * (1 - LANDMARK_SMOOTH);
+    smoothedLandmarks[i].z += (rawLm[i].z - smoothedLandmarks[i].z) * (1 - LANDMARK_SMOOTH);
+  }
+
+  return smoothedLandmarks;
+}
+
+function stabilizeTwoHands(rawHands) {
+  let [h1, h2] = rawHands;
+
+  // sort left → right using palm center
+  if (h1[9].x > h2[9].x) [h1, h2] = [h2, h1];
+
+  // init on first frame
+  if (!stableHands.left || !stableHands.right) {
+    stableHands.left  = h1.map(p => ({ ...p }));
+    stableHands.right = h2.map(p => ({ ...p }));
+    return [stableHands.left, stableHands.right];
+  }
+
+  // smooth landmarks
+  for (let i = 0; i < 21; i++) {
+    stableHands.left[i].x  += (h1[i].x - stableHands.left[i].x) * (1 - HAND_SMOOTH);
+    stableHands.left[i].y  += (h1[i].y - stableHands.left[i].y) * (1 - HAND_SMOOTH);
+    stableHands.left[i].z  += (h1[i].z - stableHands.left[i].z) * (1 - HAND_SMOOTH);
+
+    stableHands.right[i].x += (h2[i].x - stableHands.right[i].x) * (1 - HAND_SMOOTH);
+    stableHands.right[i].y += (h2[i].y - stableHands.right[i].y) * (1 - HAND_SMOOTH);
+    stableHands.right[i].z += (h2[i].z - stableHands.right[i].z) * (1 - HAND_SMOOTH);
+  }
+
+  return [stableHands.left, stableHands.right];
+}
+
+
+  const ambientCanvas = document.createElement('canvas');
+  ambientCanvas.width = 32;
+  ambientCanvas.height = 32;
+  const ambientCtx = ambientCanvas.getContext('2d');
+
+
+function sampleAmbientLight(video) {
+  if (!video.videoWidth || !video.videoHeight) return ambientLightLevel;
+
+  ambientCtx.drawImage(video, 0, 0, 32, 32);
+  const data = ambientCtx.getImageData(0, 0, 32, 32).data;
+
+  let sum = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    sum += 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+  }
+
+  return sum / ((data.length / 4) * 255);
+}
+
+
+
+hands.onResults((results) => {
+
+  let targetOpacity = 0;
+  const now = performance.now();
+  const statusEl = handStatusEl
+  skelCtx.clearRect(0, 0, skelCanvas.width, skelCanvas.height);
+
+  const handsArr = results.multiHandLandmarks || [];
+  const count = handsArr.length;
+  if (count > 0) {
+  lastHandSeenTime = performance.now();
+}
+
+
+
+  // ================= HAND STATUS PILL (GLOBAL & AUTHORITATIVE) =================
+
+let pillText = 'Hand not detected';
+
+// reset classes once (single source)
+statusEl.classList.remove('tracking', 'twohand', 'lost');
+
+// 1️⃣ Low light always wins
+if (edgeLightActive) {
+  pillText = 'Low light detected';
+  statusEl.classList.add('tracking');
+}
+
+// 2️⃣ Two hands (DO NOT depend on twoHandArmed for UI)
+else if (count === 2) {
+  pillText = 'Two-hand control';
+  statusEl.classList.add('tracking', 'twohand');
+}
+
+// 4️⃣ Single hand
+else if (count === 1) {
+  pillText = 'Hand tracking';
+  statusEl.classList.add('tracking');
+}
+
+// 5️⃣ No hands
+else {
+  pillText = 'Hand not detected';
+  statusEl.classList.add('lost');
+}
+
+statusEl.textContent = pillText;
+
+
+
+  // ===== AMBIENT LIGHT SAMPLING (ALWAYS ON) =====
+const nowTime = performance.now();
+
+if (cameraStarted && nowTime - lastAmbientSample > AMBIENT_SAMPLE_INTERVAL) {
+  const rawAmbient = sampleAmbientLight(videoElement);
+  smoothedAmbient += (rawAmbient - smoothedAmbient) * 0.2;
+  ambientLightLevel = smoothedAmbient;
+  lastAmbientSample = nowTime;
+}
+
+// ===== DARK STATE WITH HYSTERESIS =====
+// ===== DARK STATE WITH HYSTERESIS =====
+if (!darkState && ambientLightLevel < DARK_ON) {
+  darkState = true;
+
+  // 🔻 FORCE EDGE PROFILE IMMEDIATELY
+  if (window.__PARTICLE_PROFILES__) {
+    effectiveParticleCount = window.__PARTICLE_PROFILES__.EDGE;
+    geometry.setDrawRange(0, effectiveParticleCount);
+  }
+}
+else if (darkState && ambientLightLevel > DARK_OFF) {
+  darkState = false;
+
+  // 🔺 RESTORE FULL PROFILE IMMEDIATELY
+  if (window.__PARTICLE_PROFILES__) {
+    effectiveParticleCount = window.__PARTICLE_PROFILES__.FULL;
+    geometry.setDrawRange(0, effectiveParticleCount);
+  }
+}
+
+
+// ===== EDGE LIGHT FINAL RULE =====
+edgeLightActive = darkState;
+
+
+lastHandCount = count;
+
+if (edgeLightActive) {
+// ===== EDGE LIGHT (STABLE + HYSTERESIS) ====
+
+// --- OPACITY DECISION ---
+  targetOpacity = 1.0; // FULL, ALWAYS
+// apply only when meaningful change
+const currentOpacity = parseFloat(edgeLightEl.style.opacity || 0);
+
+if (!(currentOpacity === 0 && targetOpacity === 0)) {
+  smoothedEdgeOpacity += (targetOpacity - smoothedEdgeOpacity) * 0.25;
+
+  if (Math.abs(currentOpacity - smoothedEdgeOpacity) > 0.02) {
+    edgeLightEl.style.opacity = smoothedEdgeOpacity.toFixed(3);
+  }
+}
+} else {
+  // HARD SLEEP MODE
+  smoothedEdgeOpacity = 0;
+  targetOpacity = 0;
+  edgeLightEl.style.opacity = 0;
+}
+
+
+// ===== PERF MODE (V3.6) =====
+// Assist mode directly implies conservative performance
+edgeLightPerfMode = edgeLightActive;
+
+
+  /* ================= NO HANDS ================= */
+  if (count === 0) {
+
+  // allow brief MediaPipe dropouts without resetting orientation
+  if (performance.now() - lastHandSeenTime < HAND_LOSS_GRACE_MS) {
+    return;
+  }
+
+  // true loss → reset everything
+  stableHands.left = null;
+  stableHands.right = null;
+  smoothTwoHandDist = null;
+  smoothedLandmarks = null;
+  dualStillActive = false;
+
+  return;
+}
+
+
+  /* ================= COMMON RECOVERY ================= */
+
+  statusEl.classList.remove('lost');
+  statusEl.classList.add('tracking');
+
+  /* ================= DRAW ================= */
+  if (count === 1 && smoothedLandmarks) {
+  drawHand(smoothedLandmarks);
+}
+else if (count === 2 && stableHands.left && stableHands.right) {
+  drawHand(stableHands.left);
+  drawHand(stableHands.right);
+}
+
+
+  /* ================= TWO HAND MODE ================= */
+if (count === 2) {
+  const [A, B] = stabilizeTwoHands(handsArr);
+
+  // ===== DRAW (STABLE TWO HANDS ONLY) =====
+  drawHand(A);
+  drawHand(B);
+
+  
+  // ================= DUAL STILLNESS DETECTION =================
+
+  if (
+  (currentMode === APP_MODE.VIEW || currentMode === APP_MODE.EDIT) &&
+
+  performance.now() > dualStillCooldownUntil &&
+  !isMorphing &&
+  !isLocked
+) {
+
+  function openness(lm) {
+    const palm = lm[0];
+    const tips = [lm[4], lm[8], lm[12], lm[16], lm[20]];
+    let spread = 0;
+    for (const t of tips)
+      spread += Math.hypot(t.x - palm.x, t.y - palm.y);
+    const hSize = Math.hypot(lm[9].x - palm.x, lm[9].y - palm.y) || 0.001;
+    return (spread / tips.length) / hSize;
+  }
+
+  const openA = openness(A);
+  const openB = openness(B);
+
+  const minOpen = calibrating ? OPEN_MIN_FALLBACK : openMinDyn;
+  const maxOpen = calibrating ? OPEN_MAX_FALLBACK : openMaxDyn;
+
+  const normA = THREE.MathUtils.clamp((openA - minOpen) / (maxOpen - minOpen), 0, 1);
+  const normB = THREE.MathUtils.clamp((openB - minOpen) / (maxOpen - minOpen), 0, 1);
+
+  const oneOpenOneClosed =
+    (normA > DUAL_OPEN_THRESHOLD && normB < DUAL_CLOSED_THRESHOLD) ||
+    (normB > DUAL_OPEN_THRESHOLD && normA < DUAL_CLOSED_THRESHOLD);
+
+  // movement check (very strict)
+  const moveA =
+    Math.abs(A[9].x - stableHands.left[9].x) +
+    Math.abs(A[9].y - stableHands.left[9].y);
+
+  const moveB =
+    Math.abs(B[9].x - stableHands.right[9].x) +
+    Math.abs(B[9].y - stableHands.right[9].y);
+
+  const veryStill =
+    moveA < DUAL_MOVE_THRESHOLD &&
+    moveB < DUAL_MOVE_THRESHOLD;
+
+  if (oneOpenOneClosed && veryStill) {
+
+    if (!dualStillActive) {
+      dualStillActive = true;
+      dualStillStart = performance.now();
+    }
+
+    if (performance.now() - dualStillStart > DUAL_HOLD_TIME) {
+
+  dualStillCooldownUntil = performance.now() + 1500;
+  dualStillActive = false;
+
+  customMorphBoost = 1.4;
+  particles.scale.multiplyScalar(0.93);
+
+  if (currentMode === APP_MODE.VIEW) {
+  enterEditMode();
+} else {
+  customShapeActive = false;
+  regenerateCurrentProceduralShape();
+  exitEditMode(true);
+}
+
+  return;
+}
+
+
+  } else {
+    dualStillActive = false;
+  }
+}
+
+
+
+  // --- ARM / debounce logic (unchanged behavior) ---
+  if (!twoHandArmed) {
+    if (twoHandStartTime === 0) twoHandStartTime = now;
+    if (now - twoHandStartTime < TWO_HAND_ARM_DELAY) {
+      lastTwoHandDistance = null;
+      return;
+    }
+    twoHandArmed = true;
+    gestureAccum = 0;
+    lastTwoHandDistance = null;
+    twoHandCooldown = false;
+
+    statusEl.classList.add('twohand');
+    skelCanvas.classList.add('twohand');
+    return;
+  }
+
+  // --- compute per-hand openness (same method used in single-hand) ---
+  function handOpennessFromLM(lm) {
+    const palm = lm[0];
+    const tips = [lm[4], lm[8], lm[12], lm[16], lm[20]];
+    let spread = 0;
+    for (const t of tips) spread += Math.hypot(t.x - palm.x, t.y - palm.y);
+    const hSize = Math.hypot(lm[9].x - palm.x, lm[9].y - palm.y) || 0.001;
+    return (spread / tips.length) / hSize;
+  }
+
+  const opennessA = handOpennessFromLM(A);
+  const opennessB = handOpennessFromLM(B);
+
+  // --- normalize using the same calibration as single-hand ---
+  const minOpen = calibrating ? OPEN_MIN_FALLBACK : openMinDyn;
+  const maxOpen = calibrating ? OPEN_MAX_FALLBACK : openMaxDyn;
+  const normA = THREE.MathUtils.clamp((opennessA - minOpen) / (maxOpen - minOpen), 0, 1);
+  const normB = THREE.MathUtils.clamp((opennessB - minOpen) / (maxOpen - minOpen), 0, 1);
+
+  // --- require both hands to be similarly open OR similarly closed ---
+  const SIMILARITY_THRESHOLD = 0.25; // how close the normalized openness must be
+  const OPEN_THRESHOLD = 0.6;       // considered "open"
+  const CLOSED_THRESHOLD = 0.4;     // considered "closed"
+
+  const bothOpen = (normA > OPEN_THRESHOLD && normB > OPEN_THRESHOLD && Math.abs(normA - normB) < SIMILARITY_THRESHOLD);
+  const bothClosed = (normA < CLOSED_THRESHOLD && normB < CLOSED_THRESHOLD && Math.abs(normA - normB) < SIMILARITY_THRESHOLD);
+
+  // --- distance smoothing (same as before) ---
+  const pA = A[9];
+  const pB = B[9];
+  const rawDist = Math.hypot(pA.x - pB.x, pA.y - pB.y);
+
+  if (smoothTwoHandDist === null) {
+    smoothTwoHandDist = rawDist;
+  } else {
+    smoothTwoHandDist += (rawDist - smoothTwoHandDist) * 0.25;
+  }
+
+  const dist = smoothTwoHandDist;
+
+  if (lastTwoHandDistance === null) {
+    lastTwoHandDistance = dist;
+    return;
+  }
+
+  // --- If hands are not similarly open/closed, do NOT accumulate a shape gesture.
+  //     Instead gently decay any existing accumulation so stray motion won't trigger a switch.
+  if (!(bothOpen || bothClosed)) {
+    // gentle decay so recovering to matched state is clean
+    gestureAccum *= 0.92;
+    lastTwoHandDistance = dist;
+    return;
+  }
+
+  // --- Process distance delta into gesture accumulation (like before) ---
+
+    // ---------- OPENNESS-DRIVEN GESTURE (SOFT & SLOW FRIENDLY) ----------
+
+// average normalized openness
+const avgOpen = (normA + normB) * 0.5;
+
+// init openness memory
+if (lastTwoHandOpenness === null) {
+  lastTwoHandOpenness = avgOpen;
+  lastTwoHandDistance = dist;
+  return;
+}
+
+
+// openness delta (slow motion friendly)
+let openDelta = avgOpen - lastTwoHandOpenness;
+
+// smooth it heavily (CRITICAL)
+smoothOpennessDelta += (openDelta - smoothOpennessDelta) * 0.18;
+smoothOpennessDelta *= 0.9;
+
+// distance delta used ONLY as confirmation
+const distDelta = dist - lastTwoHandDistance;
+
+// require both palms moving together
+const CLOSE_EPS = 0.020;  // keep closing sensitive
+const OPEN_EPS  = 0.028;  // opening needs clearer intent
+const palmsClosing = (openDelta < -CLOSE_EPS) && bothClosed;
+const palmsOpening = (openDelta >  OPEN_EPS)  && bothOpen;
+
+
+
+// ---------- TEMPORAL INTENT FILTER (CORRECTED) ----------
+
+const INTENT_HOLD_TIME = 160; // ms (slightly lower = responsive)
+
+if (palmsClosing) {
+  if (closingIntentStart === null) closingIntentStart = now;
+  openingIntentStart = null;
+}
+else if (palmsOpening) {
+  if (openingIntentStart === null) openingIntentStart = now;
+  closingIntentStart = null;
+}
+else {
+  closingIntentStart = null;
+  openingIntentStart = null;
+}
+
+
+// ---------- ACCUMULATION ONLY AFTER STABLE INTENT ----------=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--==-
+if (!twoHandCooldown && !dualStillActive) {
+
+  // -------- FORWARD (PALMS CLOSING) --------
+  if (
+  closingIntentStart !== null &&
+  now - closingIntentStart > INTENT_HOLD_TIME &&
+  distDelta < 0.004
+) {
+    gestureAccum += Math.abs(smoothOpennessDelta) * 1.15;
+  }
+
+  // -------- BACKWARD (PALMS OPENING) --------
+  if (
+  openingIntentStart !== null &&
+  now - openingIntentStart > INTENT_HOLD_TIME &&
+  distDelta > -0.0035
+) {
+    gestureAccum -= Math.abs(smoothOpennessDelta) * 0.65;
+  }
+
+  // -------- ULTRA-SLOW DECAY --------
+  gestureAccum *= 0.992;
+
+  gestureAccum = THREE.MathUtils.clamp(
+    gestureAccum,
+    -0.35,
+    0.35
+  );
+
+  if (gestureAccum > GESTURE_THRESHOLD) {
+    switchShape(1);
+    gestureAccum = 0;
+    lastTwoHandDistance = null;
+    lastTwoHandOpenness = null;
+    closingIntentStart = null;
+    openingIntentStart = null;
+
+    return;
+  }
+
+  if (gestureAccum < -GESTURE_THRESHOLD) {
+    switchShape(-1);
+    gestureAccum = 0;
+    lastTwoHandDistance = null;
+    lastTwoHandOpenness = null;
+    closingIntentStart = null;
+    openingIntentStart = null;
+
+    return;
+  }
+}
+
+
+  if (twoHandCooldown && now - lastShapeSwitchTime > SHAPE_SWITCH_COOLDOWN_MS) {
+    twoHandCooldown = false;
+  }
+
+  lastTwoHandDistance = dist;
+  return;
+}
+
+
+  /* ================= SINGLE HAND MODE ================= */
+  // 🔒 HARD EXIT from two-hand state
+  twoHandArmed = false;
+  twoHandStartTime = 0;
+  lastTwoHandDistance = null;
+  lastTwoHandOpenness = null;
+  gestureAccum = 0;
+  twoHandCooldown = false;
+  smoothTwoHandDist = null;
+  closingIntentStart = null;
+  openingIntentStart = null;
+
+
+  statusEl.classList.remove('twohand');
+  skelCanvas.classList.remove('twohand');
+
+  const lm = smoothLandmarks(handsArr[0]);
+  // ===== DRAW (STABLE SINGLE HAND ONLY) =====
+  drawHand(lm);
+
+  stableHands.left = null;
+  stableHands.right = null; 
+
+
+  const xNorm = (0.5 - lm[9].x) * 2;
+  rawHandX = THREE.MathUtils.clamp(-xNorm, -0.85, 1.0);
+  rawHandY = (0.5 - lm[9].y) * 2;
+
+  const idx = lm[8];
+  rawRoll = Math.atan2(idx.y - lm[9].y, idx.x - lm[9].x);
+
+  const palm = lm[0];
+  const tips = [lm[4], lm[8], lm[12], lm[16], lm[20]];
+  let spread = 0;
+  for (const t of tips) spread += Math.hypot(t.x - palm.x, t.y - palm.y);
+
+  handSize = Math.hypot(lm[9].x - palm.x, lm[9].y - palm.y);
+  if (baseHandSize === null) baseHandSize = handSize;
+
+  rawOpenness = (spread / tips.length) / Math.max(handSize, 0.001);
+  rawDepth = lm[9].z;
+
+});
+
+
+let lastHandProcess = 0;
+const HAND_FPS = 24; // protected perception rate
+
+const mpCamera = new Camera(videoElement, {
+  onFrame: async () => {
+  // 🔒 HARD GATE: do nothing until experience starts
+  if (!experienceStarted) return;
+
+  const now = performance.now();
+  if (now - lastHandProcess < 1000 / HAND_FPS) return;
+  lastHandProcess = now;
+
+  if (!videoElement.videoWidth) return;
+
+  await hands.send({ image: videoElement });
+},
+
+  width: 640,
+  height: 480
+});
+
+
+async function startCamera() {
+  if (cameraStarted) return;
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  videoElement.srcObject = stream;
+  await mpCamera.start();
+  cameraStarted = true;
+}
+
+// ================= EDIT MODE CONTROL =================
+
+function enterEditMode() {
+  currentMode = APP_MODE.EDIT;
+
+  savedParticleSize = particles.material.uniforms.uSize.value;
+  particles.material.uniforms.uSize.value = savedParticleSize * 0.7;
+
+  particles.scale.setScalar(particles.scale.x * 0.94);
+  particles.rotation.x *= 0.85;
+  particles.rotation.y *= 0.85;
+
+  editorCanvas.style.opacity = "1";
+  editorCanvas.style.pointerEvents = "auto";
+
+  handStatusEl.textContent = "Edit Mode (Press ESC to exit)";
+
+}
+
+
+function exitEditMode(revert = true) {
+
+  currentMode = APP_MODE.VIEW;
+
+  editorCanvas.style.opacity = "0";
+  editorCanvas.style.pointerEvents = "none";
+
+  if (savedParticleSize !== null) {
+    particles.material.uniforms.uSize.value = savedParticleSize;
+  }
+
+  editorCtx.clearRect(0, 0, editorCanvas.width, editorCanvas.height);
+  currentPath = [];
+
+  if (revert) {
+    regenerateCurrentProceduralShape();
+  }
+}
+
+
+
+// ================= BASIC DRAW SYSTEM =================
+
+let drawing = false;
+let currentPath = [];
+
+editorCanvas.addEventListener("pointerdown", (e) => {
+  if (currentMode !== APP_MODE.EDIT) return;
+
+  editorCanvas.setPointerCapture(e.pointerId);
+
+  drawing = true;
+  currentPath = [];
+});
+
+editorCanvas.addEventListener("pointermove", (e) => {
+  if (!drawing) return;
+
+  currentPath.push({
+    x: e.clientX,
+    y: e.clientY
+  });
+
+  drawEditor();
+});
+
+editorCanvas.addEventListener("pointerup", () => {
+  drawing = false;
+  editorCanvas.releasePointerCapture(e.pointerId);
+
+});
+
+
+// ADD THIS EXACTLY BELOW pointerup
+editorCanvas.addEventListener("pointerleave", () => {
+  drawing = false;
+});
+
+
+editorCanvas.addEventListener("dblclick", () => {
+  currentPath = [];
+  drawEditor();
+});
+
+
+function drawEditor() {
+  editorCtx.clearRect(0, 0, editorCanvas.width, editorCanvas.height);
+
+  // subtle dark overlay
+  editorCtx.fillStyle = "rgba(0,0,0,0.25)";
+  editorCtx.fillRect(0, 0, editorCanvas.width, editorCanvas.height);
+
+  editorCtx.strokeStyle = "#9b4dff";
+  editorCtx.lineWidth = 2;
+
+  editorCtx.beginPath();
+
+  for (let i = 0; i < currentPath.length; i++) {
+    const p = currentPath[i];
+    if (i === 0) editorCtx.moveTo(p.x, p.y);
+    else editorCtx.lineTo(p.x, p.y);
+  }
+
+  editorCtx.stroke();
+}
+
+
+// ================= PATH → PARTICLE CONVERSION =================
+
+function generateShapeFromPath() {
+
+  // 1️⃣ Compute bounding box
+  let minX = Infinity, minY = Infinity;
+  let maxX = -Infinity, maxY = -Infinity;
+
+  for (const p of currentPath) {
+    if (p.x < minX) minX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y > maxY) maxY = p.y;
+  }
+
+  const width = maxX - minX;
+  const height = maxY - minY;
+  const size = Math.max(width, height);
+
+  if (size < 10) return;
+
+  // 2️⃣ Normalize and center
+  // ----- CENTER + CONSISTENT SCALE -----
+
+const DRAW_WORLD_SIZE = 90; // slightly larger than before
+
+// Compute true center
+const centerX = (minX + maxX) * 0.5;
+const centerY = (minY + maxY) * 0.5;
+
+// Normalize relative to center
+const normalized = currentPath.map(p => {
+
+  const nx = (p.x - centerX) / size;
+  const ny = (p.y - centerY) / size;
+
+  return {
+    x: nx * DRAW_WORLD_SIZE,
+    y: -ny * DRAW_WORLD_SIZE
+  };
+});
+
+
+  // 3️⃣ Distribute particles along path (outline mode)
+  
+  // 3️⃣ Compute cumulative arc length
+const segments = [];
+let totalLength = 0;
+
+for (let i = 1; i < normalized.length; i++) {
+  const dx = normalized[i].x - normalized[i - 1].x;
+  const dy = normalized[i].y - normalized[i - 1].y;
+  const len = Math.hypot(dx, dy);
+
+  segments.push({
+    start: normalized[i - 1],
+    end: normalized[i],
+    length: len
+  });
+
+  totalLength += len;
+}
+
+if (totalLength === 0) return;
+
+const count = Math.floor(effectiveParticleCount * 0.85);
+
+let distStep = totalLength / count;
+
+let currentSeg = 0;
+let accumulated = 0;
+let segAccum = segments[0].length;
+
+for (let i = 0; i < count; i++) {
+
+  const targetDist = i * distStep;
+
+  while (targetDist > segAccum && currentSeg < segments.length - 1) {
+    accumulated = segAccum;
+    currentSeg++;
+    segAccum += segments[currentSeg].length;
+  }
+
+  const seg = segments[currentSeg];
+  const localDist = targetDist - accumulated;
+  const t = seg.length > 0 ? localDist / seg.length : 0;
+
+  const x = seg.start.x + (seg.end.x - seg.start.x) * t;
+  const y = seg.start.y + (seg.end.y - seg.start.y) * t;
+
+  targetPositions[i * 3]     = x;
+  targetPositions[i * 3 + 1] = y;
+  // ----- 3D DEPTH VOLUME -----
+
+const radial = Math.hypot(x, y) / DRAW_WORLD_SIZE;
+
+// more depth near center, less near edges
+const depthSpread = THREE.MathUtils.lerp(28, 8, radial);
+
+targetPositions[i * 3 + 2] =
+  (Math.random() - 0.5) * depthSpread;
+
+}
+
+
+  isMorphing = true;
+  normalsDirty = true;
+  customShapeActive = true;   // 🔒 prevent saturn/galaxy overrides
+  customMorphBoost = 1.25;
+  exitEditMode(false);
+}
+
+
+// ==================== ANIMATION ====================
+// NOTE: We also update particle colors here to simulate
+// light coming from ONE SIDE (fake directional lighting)
+let targetScale = 1;
+
+let animationRunning = false;
+let visualsReady = false; // ⬅ blocks first frames
+
+function applyVibe(vibe) {
+
+  if (vibe === "calm") {
+    vibeSettings.morphSpeed = 0.85;
+    vibeSettings.motionDamp = 1.15;
+    vibeSettings.glowBoost = 0.9;
+    vibeSettings.colorShift = 0;
+    vibeSettings.breatheSpeed = 0.6;
+    vibeSettings.depthSoftness = 1.2;
+  }
+
+  else if (vibe === "focused") {
+    vibeSettings.morphSpeed = 1.0;
+    vibeSettings.motionDamp = 1.3;
+    vibeSettings.glowBoost = 0.8;
+    vibeSettings.colorShift = 0;
+    vibeSettings.breatheSpeed = 0.4;
+    vibeSettings.depthSoftness = 0.8;
+  }
+
+  else if (vibe === "energetic") {
+    vibeSettings.morphSpeed = 1.3;
+    vibeSettings.motionDamp = 0.85;
+    vibeSettings.glowBoost = 1.35;
+    vibeSettings.colorShift = 0;
+    vibeSettings.breatheSpeed = 1.8;
+    vibeSettings.depthSoftness = 0.9;
+  }
+
+  else if (vibe === "mystic") {
+    vibeSettings.morphSpeed = 0.95;
+    vibeSettings.motionDamp = 0.95;
+    vibeSettings.glowBoost = 1.2;
+    vibeSettings.colorShift = 1;
+    vibeSettings.breatheSpeed = 1.0;
+    vibeSettings.depthSoftness = 1.1;
+  }
+
+  // === APPLY VIBE COLOR TO PARTICLES ===
+const [baseHex, highlightHex] = VIBE_COLORS[vibe];
+
+const baseColor = new THREE.Color(baseHex);
+const highlightColor = new THREE.Color(highlightHex);
+
+material.uniforms.uMidColor.value.copy(baseColor);
+material.uniforms.uHighlightColor.value.copy(highlightColor);
+
+}
+
+
+function animate() {
+  if (currentTier === SIMULATION_TIER.IDLE && lastHandCount === 0) {
+  if (galaxyTick++ % 3 !== 0) {
+    requestAnimationFrame(animate);
+    return;
+  }
+}
+
+  if (!experienceStarted || !visualsReady) {
+  requestAnimationFrame(animate);
+  return;
+}
+
+
+    if (currentMode === APP_MODE.EDIT) {
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+    return;
+  }
+
+
+  const now = performance.now();
+  material.uniforms.uTime.value = now * 0.001;
+  material.uniforms.uGlowBoost.value = vibeSettings.glowBoost;
+
+  if (vibeSettings.colorShift && SHAPES[currentShapeIndex] !== 'spiral') {
+  const t = now * 0.00025;
+  const hueShift = Math.sin(t) * 0.08;
+
+  const base = SHAPE_COLORS[SHAPES[currentShapeIndex]].mid.clone();
+  base.offsetHSL(hueShift, 0, 0);
+
+  material.uniforms.uMidColor.value.copy(base);
+}
+
+
+  const dt = now - lastFrameTime;
+  lastFrameTime = now;
+
+  //Dev Ops
+  fpsFrames++;
+
+if (now - fpsLastTime >= 1000) {
+  fps = fpsFrames;
+  fpsFrames = 0;
+  fpsLastTime = now;
+}
+
+
+  updatePerfLevel(dt);
+  updateSimulationTier();
+
+  // ===== PARTICLE PROFILE SWITCH (EDGE LIGHT) =====
+if (window.__PARTICLE_PROFILES__) {
+  let desired;
+
+  if (devMode && devForceProfile) {
+    desired = window.__PARTICLE_PROFILES__[devForceProfile];
+  } else {
+    desired = edgeLightActive
+      ? window.__PARTICLE_PROFILES__.EDGE
+      : window.__PARTICLE_PROFILES__.FULL;
+  }
+
+  if (!isMorphing && effectiveParticleCount !== desired) {
+  effectiveParticleCount = desired;
+  geometry.setDrawRange(0, effectiveParticleCount);
+}
+
+}
+
+
+
+if (devMode && now - lastGraphUpdate > GRAPH_UPDATE_INTERVAL) {
+  lastGraphUpdate = now;
+
+  // smooth fps before pushing
+  const smoothFPS = fpsHistory[fpsHistory.length - 1] * 0.7 + fps * 0.3;
+  fpsHistory.push(smoothFPS);
+  fpsHistory.shift();
+
+  // draw graph
+  graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+
+  graphCtx.beginPath();
+  fpsHistory.forEach((v, i) => {
+    const x = (i / (GRAPH_POINTS - 1)) * graphCanvas.width;
+    const y = graphCanvas.height - (v / 60) * graphCanvas.height;
+    if (i === 0) graphCtx.moveTo(x, y);
+    else graphCtx.lineTo(x, y);
+  });
+
+  graphCtx.strokeStyle = '#9b4dff';
+  graphCtx.lineWidth = 2;
+  graphCtx.stroke();
+}
+
+
+// ---------- PER-SHAPE MATERIAL CONTROL ----------
+const densityFactor = Math.sqrt(24000 / effectiveParticleCount);
+material.uniforms.uSize.value = shapeTextureBias.size * 1.6 * densityFactor;
+
+
+// default: physical
+material.blending  = THREE.NormalBlending;
+material.alphaTest = 0.18;
+
+// cinematic exceptions
+if (SHAPES[currentShapeIndex] === 'saturn') {
+  material.blending  = THREE.AdditiveBlending;
+  material.alphaTest = 0.05;
+}
+
+  // ---- Spiral glow mode ----
+if (SHAPES[currentShapeIndex] === 'spiral') {
+  material.blending  = THREE.AdditiveBlending;
+  material.alphaTest = 0.08;
+
+  material.uniforms.uGlowBoost.value =
+  vibeSettings.glowBoost * 0.65;
+  // reduce burn
+}
+
+
+
+// ===== UI PULSE BASED ON MOTION =====
+const uiPulse =
+  Math.min(
+    1,
+    Math.abs(handX) +
+    Math.abs(handY) +
+    Math.abs(handOpenness)
+  );
+
+handStatusEl.style.transform =
+  `translateX(-50%) scale(${1 + uiPulse * 0.08})`;
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+  // ---------- LOCK RING VISUAL ----------
+if (lockRing) {
+  // follow object
+  lockRing.position.copy(particles.position);
+  lockRing.rotation.y = particles.rotation.y;
+
+  // fade ring in/out
+  lockRingMaterial.opacity = lockProgress > 0
+    ? THREE.MathUtils.lerp(lockRingMaterial.opacity, 0.85, 0.15)
+    : THREE.MathUtils.lerp(lockRingMaterial.opacity, 0.0, 0.2);
+
+  // show progress by scaling Y
+  lockRing.scale.y = THREE.MathUtils.lerp(
+    0.001,
+    1.0,
+    lockProgress
+  );
+
+  // subtle pulse when fully locked
+  if (isLocked) {
+    const pulse = 1 + Math.sin(performance.now() * 0.004) * 0.03;
+    lockRing.scale.set(pulse, pulse, pulse);
+  }
+}
+
+
+  handX += (rawHandX - handX) * ROTATE_SMOOTH;
+  handY += (rawHandY - handY) * ROTATE_SMOOTH;
+  handOpenness += (rawOpenness - handOpenness) * 0.08;
+  handRoll += (rawRoll - handRoll) * 0.15;
+  handDepth += (rawDepth - handDepth) * 0.1;
+
+
+  const MAX_TILT = Math.PI / 3;
+  const targetX = THREE.MathUtils.clamp(-handY * 1.25, -MAX_TILT, MAX_TILT);
+  const targetY = THREE.MathUtils.clamp(-handX * 1.25,-MAX_TILT,MAX_TILT);
+  const targetZ = THREE.MathUtils.clamp(handRoll * 0.6, -Math.PI / 4, Math.PI / 4);
+
+  const minOpen = calibrating ? OPEN_MIN_FALLBACK : openMinDyn;
+  const maxOpen = calibrating ? OPEN_MAX_FALLBACK : openMaxDyn;
+  const opennessNorm = THREE.MathUtils.clamp((handOpenness - minOpen) / (maxOpen - minOpen), 0, 1);
+
+  // ===== INTENT-BASED SCALE (RELATIVE, NOT ABSOLUTE) =====
+  const intent = THREE.MathUtils.smoothstep(
+    opennessNorm,
+    0.15, // ignore noise
+    0.75  // full intent
+  );
+
+  const gestureScale = THREE.MathUtils.lerp(
+    0.6,  // strong shrink
+    1.0,  // normal
+    intent
+  );
+
+  const finalScale = BASE_SCALE * gestureScale;
+
+if (!isLocked) {
+
+  // ROTATION
+  const fade = 1.0;
+
+// 👉 NORMAL SHAPES ROTATE DIRECTLY
+const rotSpeed =
+  SHAPES[currentShapeIndex] === 'saturn'
+    ? 0.38   // faster, more physical
+    : 0.22;  // default cinematic
+
+
+particles.rotation.x += (targetX - particles.rotation.x) * rotSpeed * fade / vibeSettings.motionDamp;
+particles.rotation.y += (targetY - particles.rotation.y) * rotSpeed * fade / vibeSettings.motionDamp;
+particles.rotation.z += (targetZ - particles.rotation.z) * (rotSpeed * 0.7) * fade / vibeSettings.motionDamp;
+
+
+const breathe =
+  1 +
+  Math.sin(now * 0.001 * vibeSettings.breatheSpeed) * 0.02;
+
+const scaledTarget = finalScale * breathe;
+
+particles.scale.setScalar(
+  particles.scale.x +
+  (scaledTarget - particles.scale.x) * 0.14 * fade
+);
+
+
+  // REAL DEPTH (camera z)
+  depthFactor = THREE.MathUtils.clamp(
+  handDepth * -420 / vibeSettings.depthSoftness,
+  -80,
+  60
+  );
+
+
+} else {
+  // 🔒 HARD FREEZE
+  particles.rotation.set(frozenRotX, frozenRotY, frozenRotZ);
+  particles.scale.setScalar(frozenScale);
+  depthFactor = frozenDepth;
+}
+
+particles.position.z += (depthFactor - particles.position.z) * 0.22;
+
+  const rotDelta =
+  Math.abs(particles.rotation.x - lastRotX) +
+  Math.abs(particles.rotation.y - lastRotY) +
+  Math.abs(particles.rotation.z - lastRotZ);
+
+  const handStill =
+  Math.abs(rawHandX - handX) < 0.002 &&
+  Math.abs(rawHandY - handY) < 0.002 &&
+  Math.abs(rawOpenness - handOpenness) < 0.003;
+
+
+colorUpdateCooldown -= perfLevel < 1 ? 2 : 1;
+
+colorFrameSkip++;
+
+if (isMorphing) {
+
+  let done = true;
+
+  const ease = 0.14 * customMorphBoost * vibeSettings.morphSpeed;
+  customMorphBoost = 1;
+
+  const morphLimit = effectiveParticleCount * 3;
+
+  for (let i = 0; i < morphLimit; i++) {
+
+    const delta = targetPositions[i] - positions[i];
+
+    positions[i] += delta * ease;
+
+    if (Math.abs(delta) > MORPH_EPSILON) {
+      done = false;
+    }
+  }
+
+  geometry.attributes.position.needsUpdate = true;
+
+  if (done) {
+  positions.set(targetPositions);
+  geometry.attributes.position.needsUpdate = true;
+  geometry.computeBoundingSphere();
+
+  if (SHAPES[currentShapeIndex] !== 'spiral') {
+    recomputeNormals();
+  }
+
+  isMorphing = false;
+}
+}
+
+
+ // ---- Cinematic Spiral Animation ----
+if (SHAPES[currentShapeIndex] === 'spiral' && !isMorphing && spiralBase) {
+
+  const pos = geometry.attributes.position.array;
+  const norm = geometry.attributes.normal.array;
+
+
+  const baseSpeed =
+    perfLevel === 1.0 ? 0.00025 :
+    perfLevel === 0.7 ? 0.00015 :
+                        0.00008;
+
+  spiralPhase += baseSpeed;
+  spiralCorePhase += baseSpeed * 2.2; // core spins faster
+
+  const time = now * 0.00035;
+
+  for (let i = 0; i < effectiveParticleCount; i++) {
+
+    const bx = spiralBase[i * 3];
+    const by = spiralBase[i * 3 + 1];
+    const bz = spiralBase[i * 3 + 2];
+
+    const r = Math.hypot(bx, bz);
+    const baseAngle = Math.atan2(bz, bx);
+
+    const radialNorm = Math.min(r / 110, 1.0);
+
+    // ---- differential rotation ----
+    const swirl =
+      r < 25
+        ? spiralCorePhase
+        : spiralPhase * (0.4 + (1.0 - radialNorm) * 0.9);
+
+    // ---- gravitational inward pull illusion ----
+    const gravity =
+      1.0 - radialNorm * 0.15;
+
+    // ---- subtle arm ripple ----
+    const ripple =
+      Math.sin(time * 1.8 + baseAngle * 6.0 + r * 0.05) * 0.018;
+
+    const angle = baseAngle + swirl + ripple;
+
+    const breathe = 1.0 + Math.sin(time + r * 0.05) * 0.01;
+
+    pos[i * 3]     = Math.cos(angle) * r * gravity * breathe;
+    pos[i * 3 + 1] = by + Math.sin(time + r * 0.02) * 0.5;
+    pos[i * 3 + 2] = Math.sin(angle) * r * gravity * breathe;
+
+    const nx = pos[i * 3];
+    const ny = pos[i * 3 + 1];
+    const nz = pos[i * 3 + 2];
+
+    const len = Math.hypot(nx, ny, nz) || 1;
+
+    norm[i * 3]     = nx / len;
+    norm[i * 3 + 1] = ny / len;
+    norm[i * 3 + 2] = nz / len;
+
+  }
+
+  geometry.attributes.position.needsUpdate = true;
+  geometry.attributes.normal.needsUpdate = true;
+
+}
+
+
+// ---- Cinematic camera drift ----
+if (SHAPES[currentShapeIndex] === 'spiral') {
+
+  const t = performance.now() * 0.00008;
+
+  camera.position.x = Math.sin(t) * 12;
+  camera.position.z = 130 + Math.sin(t * 0.5) * 10;
+  camera.position.y = Math.cos(t * 0.7) * 6;
+  camera.lookAt(0, 0, 0);
+}
+
+
+
+  // -------- SATURN RING ORBIT MOTION --------
+  if (
+  SHAPES[currentShapeIndex] === 'saturn' &&
+  saturnRingBase &&
+  !isMorphing &&
+  galaxyTick % 2 < 1 &&
+  !customShapeActive
+) {
+
+  const speed = perfLevel === 1.0 ? 0.008 : perfLevel === 0.7 ? 0.004 : 0.002;
+  ringAngle += speed + handX * 0.002;
+
+
+  const posArr = geometry.attributes.position.array;
+
+  for (let i = 0; i < saturnRingCount; i++) {
+    const idx = saturnRingStart + i;
+
+    const bx = saturnRingBase[i * 2];
+const bz = saturnRingBase[i * 2 + 1];
+
+const r = Math.hypot(bx, bz);
+const baseAngle = Math.atan2(bz, bx);
+
+const swirl = Math.sin(baseAngle * 6 + ringAngle) * 0.008;
+const a = baseAngle + ringAngle * 0.04 + swirl;
+
+posArr[idx * 3]     = Math.cos(a) * r;
+posArr[idx * 3 + 2] = Math.sin(a) * r;
+
+  }
+
+  const posAttr = geometry.attributes.position;
+  posAttr.updateRange.offset = saturnRingStart * 3;
+  posAttr.updateRange.count  = saturnRingCount * 3;
+  posAttr.needsUpdate = true;
+
+}
+
+
+
+  if (currentTier === SIMULATION_TIER.IDLE) {
+  particles.rotation.x *= 0.98;
+  particles.rotation.y *= 0.98;
+  particles.rotation.z *= 0.98;
+
+  if (lastHandCount === 0) {
+  particles.rotation.y += 0.0008;
+}
+
+}
+
+  if (devMode && now - lastDevUpdate > DEV_UPDATE_INTERVAL) {
+  lastDevUpdate = now;
+
+  document.getElementById('dev-fps').textContent = fps;
+  document.getElementById('dev-ms').textContent = dt.toFixed(1);
+  document.getElementById('dev-particles').textContent = effectiveParticleCount;
+  document.getElementById('dev-shape').textContent =
+    SHAPES[currentShapeIndex];
+  document.getElementById('dev-profile').textContent =
+  edgeLightActive ? 'EDGE' : 'FULL';
+
+
+  document.getElementById('dev-hands').textContent = lastHandCount;
+  document.getElementById('dev-open').textContent = handOpenness.toFixed(2);
+  document.getElementById('dev-depth').textContent = depthFactor.toFixed(1);
+
+  document.getElementById('dev-perf').textContent = perfLevel.toFixed(2);
+  document.getElementById('dev-tier').textContent =
+    Object.keys(SIMULATION_TIER).find(k => SIMULATION_TIER[k] === currentTier);
+  document.getElementById('dev-edge').textContent =
+    edgeLightPerfMode ? 'ON' : 'OFF';
+  document.getElementById('dev-lock').textContent =
+    runtimeLocked ? 'YES' : 'NO';
+  
+  // ===== DEV FRAME LOAD HEAT BAR =====
+  const heat = Math.min(100, (avgFrameTime / 33) * 100);
+  const heatEl = document.getElementById('dev-heat');
+
+  if (heatEl) {
+    heatEl.style.width = heat.toFixed(0) + '%';
+    heatEl.style.background =
+      heat < 60 ? '#6aff9b' :
+      heat < 85 ? '#ffd36a' :
+                  '#ff6a6a';
+}
+
+
+  document.getElementById('dev-ambient').textContent =
+  ambientLightLevel.toFixed(3);
+
+  document.getElementById('dev-dark').textContent =
+  darkState ? 'YES' : 'NO';
+
+}
+
+
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+
+/* =====================================================
+   BOOT SEQUENCE (REPLACES DIRECT animate() CALL)
+   ===================================================== */
+  (async function boot() {
+  const loader = document.getElementById('loader');
+  const loaderVideo = document.getElementById('loaderVideo');
+
+  // loader loops while system prepares
+  loaderVideo.loop = true;
+  loaderVideoFinished = false;
+  systemReady = false;
+
+  // fires ONLY after loop is disabled and video ends
+  loaderVideo.addEventListener('ended', () => {
+    loaderVideoFinished = true;
+  });
+
+  // ---- GPU benchmark ----
+  const benchScene = new THREE.Scene();
+  const benchCam = new THREE.PerspectiveCamera(60, 1, 0.1, 500);
+  benchCam.position.z = 120;
+
+
+  // 🔒 hide WebGL canvas during benchmark to prevent white flash
+  const canvas = renderer.domElement;
+  const prevVisibility = canvas.style.visibility;
+  canvas.style.visibility = "hidden";
+
+  const safeCount = await benchmarkParticles(renderer, benchScene, benchCam);
+  // 🔓 restore canvas after benchmark
+  canvas.style.visibility = "visible";
+
+  benchScene.clear();
+
+  MAX_PARTICLES = safeCount;
+
+  const FULL_PARTICLES = safeCount;
+  const EDGE_PARTICLES = Math.floor(safeCount * 0.6);
+
+  window.__PARTICLE_PROFILES__ = {
+    FULL: FULL_PARTICLES,
+    EDGE: EDGE_PARTICLES
+  };
+
+  effectiveParticleCount = FULL_PARTICLES;
+  geometry.setDrawRange(0, effectiveParticleCount);
+
+  runtimeLocked = true;
+
+  console.log('[BOOT] Particle budget:', safeCount);
+
+  // system ready → stop looping, allow current video pass to finish
+  systemReady = true;
+  loaderVideo.loop = false;
+
+  // wait for BOTH: system + video finish
+  await new Promise(resolve => {
+    const check = () => {
+      if (systemReady && loaderVideoFinished) {
+        resolve();
+      } else {
+        requestAnimationFrame(check);
+      }
+    };
+    check();
+  });
+
+  // transition
+  loader.remove();
+  showIntro();
+})();
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function enterFullscreen(e) {
+  // already fullscreen → ignore
+  if (document.fullscreenElement) return;
+
+  // must come from real user interaction
+  if (e && e.isTrusted === false) return;
+
+  const el = document.documentElement;
+
+  try {
+    if (el.requestFullscreen) {
+      el.requestFullscreen();
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    } else if (el.msRequestFullscreen) {
+      el.msRequestFullscreen();
+    }
+  } catch (err) {
+  handStableSince = null;
+  edgeLightActive = false;
+  currentTier = SIMULATION_TIER.IDLE;
+
+  handStatusEl.textContent = 'Camera permission denied';
+  console.error(err);
+}
+
+}
+
+
+// ==================== START ====================
+function startMainExperience(e, skipIntro = false) {
+
+  if (!window.CURRENT_USER) {
+  alert("Login required");
+  return;
+  }
+
+
+
+  if (experienceStarted) return;
+
+  experienceStarted = true;
+  runtimeLocked = true;
+
+  document.getElementById("logoutBtn").style.display = "block";
+
+  showWelcomeMessage(window.CURRENT_USER.username);
+
+  setTimeout(() => {
+  const hint = document.getElementById("gestureHint");
+  hint.style.opacity = 1;
+
+  setTimeout(() => {
+    hint.style.opacity = 0;
+  }, 6000);
+
+}, 3500);
+
+  // Fullscreen only on real user gesture
+  if (e && e.isTrusted) {
+  enterFullscreen(e);
+}
+
+
+  const intro = document.getElementById('intro');
+  const loader = document.getElementById('loader');
+
+  // DEV SKIP
+  if (skipIntro) {
+    if (loader) loader.remove();
+    if (intro) intro.remove();
+  } else {
+    if (intro) intro.classList.add('exit');
+  }
+
+  setTimeout(async () => {
+    if (!skipIntro && intro) intro.remove();
+
+    try {
+      await startCamera();
+      // 🔓 FAILSAFE: ensure visuals unlock even if welcome timing fails
+setTimeout(() => {
+  if (!visualsReady) {
+    visualsReady = true;
+    renderer.domElement.style.opacity = "1";
+
+    console.warn("[SAFE UNLOCK] visualsReady forced true");
+  }
+  }, 3000);
+
+    } catch (err) {
+      handStatusEl.textContent = 'Camera permission denied';
+      console.error(err);
+    }
+  }, skipIntro ? 0 : 1200);
+}
+
+
+handStatusEl.addEventListener('click', (e) => {
+  enterFullscreen(e);
+});
+
+
+
+document.getElementById('devProfileBtn').addEventListener('click', () => {
+  if (!window.CURRENT_USER || window.CURRENT_USER.role !== "developer") return;
+  if (!devMode) return;
+
+  if (devForceProfile === null) devForceProfile = 'EDGE';
+  else if (devForceProfile === 'EDGE') devForceProfile = 'FULL';
+  else devForceProfile = null;
+});
+
+
+document.getElementById('devShapeBtn').addEventListener('click', () => {
+  if (!window.CURRENT_USER || window.CURRENT_USER.role !== "developer") return;
+  if (!devMode) return;
+  if (isMorphing) return;
+
+  const now = performance.now();
+  if (now - lastShapeSwitchTime < SHAPE_SWITCH_COOLDOWN_MS) return;
+
+  switchShape(1);
+});
+
+
+document.getElementById('devEditBtn').addEventListener('click', () => {
+
+  if (!window.CURRENT_USER || window.CURRENT_USER.role !== "developer") return;
+  if (!devMode) return;
+  if (currentMode === APP_MODE.VIEW) {
+    enterEditMode();
+  } else {
+    exitEditMode();
+  }
+});
+
+
+document.getElementById('devGenerateBtn').addEventListener('click', () => {
+
+  if (!window.CURRENT_USER || window.CURRENT_USER.role !== "developer") return;
+  if (!devMode) return;
+  if (currentMode !== APP_MODE.EDIT) return;
+  if (currentPath.length < 10) return;
+
+  generateShapeFromPath();
+});
+
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+document.addEventListener('fullscreenchange', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  if (!document.fullscreenElement) {
+    document.body.style.cursor = 'default';
+    handStatusEl.textContent = 'Tap here to re-enter fullscreen';
+  }
+});
+
+
+const modal = document.getElementById("createProfileModal");
+
+const authTabs = document.querySelectorAll(".auth-tab");
+const registerExtras = document.getElementById("registerExtras");
+const authSubmitBtn = document.getElementById("authSubmitBtn");
+
+let authMode = "login";
+
+// Default state = login
+registerExtras.classList.add("hidden");
+authSubmitBtn.textContent = "Login";
+
+authTabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+
+    authTabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+
+    authMode = tab.dataset.mode;
+
+    if (authMode === "login") {
+  registerExtras.classList.remove("visible");
+  registerExtras.classList.add("hidden");
+  authSubmitBtn.textContent = "Login";
+} else {
+  registerExtras.classList.remove("hidden");
+  registerExtras.classList.add("visible");
+  authSubmitBtn.textContent = "Register";
+}
+
+  });
+});
+
+
+const vibeGroup = document.getElementById("vibeGroup");
+const createBtn = document.getElementById("authSubmitBtn");
+
+vibeGroup.addEventListener("click", (e) => {
+  const btn = e.target.closest(".pill");
+  if (!btn) return;
+
+  // remove active state
+  vibeGroup.querySelectorAll(".pill")
+    .forEach(p => p.classList.remove("active"));
+
+  // activate selected
+  btn.classList.add("active");
+
+  // update logical state
+  selectedVibe = btn.dataset.vibe;
+
+  // update Create button gradient
+  const [c1, c2] = VIBE_COLORS[selectedVibe];
+
+  // update CSS variables
+  createBtn.style.setProperty("--vibe-a", c1);
+  createBtn.style.setProperty("--vibe-b", c2);
+
+  createBtn.style.boxShadow = `0 0 36px ${c1}66`;
+
+  // restart wave animation cleanly
+  createBtn.style.animation = "none";
+  createBtn.offsetHeight; // force reflow
+  createBtn.style.animation = "vibeWave 6s ease infinite";
+
+});
+
+
+authSubmitBtn.addEventListener("click", async (e) => {
+
+  const name = document.getElementById("newProfileName").value.trim();
+  const password = document.getElementById("newProfilePassword").value.trim();
+
+  if (!name || !password) {
+    alert("Username and password required");
+    return;
+  }
+
+  if (authMode === "register") {
+
+    const gender = document.getElementById("newProfileGender").value;
+
+    const res = await fetch(`${window.BACKEND_URL}/api/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+      username: name, 
+      password, 
+      gender,
+      vibe: selectedVibe
+})
+    });
+
+    if (!res.ok) {
+      alert("Registration failed");
+      return;
+    }
+  }
+
+  // login flow (shared)
+  const loginRes = await fetch(`${window.BACKEND_URL}/api/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: name, password })
+  });
+
+  if (!loginRes.ok) {
+    alert("Invalid credentials");
+    return;
+  }
+
+  const loginData = await loginRes.json();
+  localStorage.setItem("token", loginData.token);
+
+  const meRes = await fetch(`${window.BACKEND_URL}/api/me`, {
+    headers: { Authorization: `Bearer ${loginData.token}` }
+  });
+
+  const user = await meRes.json();
+  
+  window.CURRENT_USER = user;
+
+// CLEAR INPUT FIELDS
+document.getElementById("newProfileName").value = "";
+document.getElementById("newProfilePassword").value = "";
+
+modal.classList.add("hidden");
+
+window.ACTIVE_VIBE = user.vibe || selectedVibe || "calm";
+
+const transition = document.getElementById("loginTransition");
+
+// hide modal
+modal.classList.add("hidden");
+
+// activate cinematic layer
+transition.classList.remove("hidden");
+transition.classList.add("active");
+
+// delay universe start
+setTimeout(() => {
+
+  applyVibe(window.ACTIVE_VIBE);
+
+  startMainExperience(e, true);
+
+  // fade transition out
+  transition.classList.remove("active");
+
+  setTimeout(() => {
+    transition.classList.add("hidden");
+  }, 600);
+
+}, 900);
+});
+
+
+// ================= DEV ADMIN CONTROLS =================
+
+const devAdminToggle = document.getElementById("devAdminToggle");
+const devMorph = document.getElementById("devMorph");
+const devGlow = document.getElementById("devGlow");
+const devMotion = document.getElementById("devMotion");
+const devBreathe = document.getElementById("devBreathe");
+const devMorphVal = document.getElementById("devMorphVal");
+const devGlowVal = document.getElementById("devGlowVal");
+const devMotionVal = document.getElementById("devMotionVal");
+const devBreatheVal = document.getElementById("devBreatheVal");
+
+
+function syncDevSliders() {
+  if (!window.CURRENT_USER) return;
+
+  const morph = window.CURRENT_USER.customMorphSpeed ?? 1;
+  const glow = window.CURRENT_USER.customGlow ?? 1;
+  const motion = window.CURRENT_USER.customMotionDamp ?? 1;
+  const breathe = window.CURRENT_USER.customBreatheSpeed ?? 1;
+
+  if (devAdminToggle)
+  devAdminToggle.checked = false;
+
+  if (devMorph) {
+    devMorph.value = morph;
+    if (devMorphVal) devMorphVal.textContent = morph.toFixed(2);
+  }
+
+  if (devGlow) {
+    devGlow.value = glow;
+    if (devGlowVal) devGlowVal.textContent = glow.toFixed(2);
+  }
+
+  if (devMotion) {
+    devMotion.value = motion;
+    if (devMotionVal) devMotionVal.textContent = motion.toFixed(2);
+  }
+
+  if (devBreathe) {
+    devBreathe.value = breathe;
+    if (devBreatheVal) devBreatheVal.textContent = breathe.toFixed(2);
+  }
+}
+
+
+devAdminToggle.addEventListener("change", () => {
+  // purely local toggle now
+  applyVibe(window.ACTIVE_VIBE);
+});
+
+
+devMorph.addEventListener("input", async () => {
+
+  const value = parseFloat(devMorph.value);
+  devMorphVal.textContent = value.toFixed(2);
+
+  window.CURRENT_USER.customMorphSpeed = value;
+  applyVibe(window.ACTIVE_VIBE);
+});
+
+
+
+devGlow.addEventListener("input", async () => {
+
+  const value = parseFloat(devGlow.value);
+  devGlowVal.textContent = value.toFixed(2);
+
+  window.CURRENT_USER.customGlow = value;
+  applyVibe(window.ACTIVE_VIBE);
+});
+
+
+devMotion.addEventListener("input", async () => {
+
+  const value = parseFloat(devMotion.value);
+  devMotionVal.textContent = value.toFixed(2);
+
+  window.CURRENT_USER.customMotionDamp = value;
+  applyVibe(window.ACTIVE_VIBE);
+});
+
+
+devBreathe.addEventListener("input", async () => {
+
+  const value = parseFloat(devBreathe.value);
+  devBreatheVal.textContent = value.toFixed(2);
+
+  window.CURRENT_USER.customBreatheSpeed = value;
+  applyVibe(window.ACTIVE_VIBE);
+});
+
+
+document.getElementById("devResetAdmin").addEventListener("click", async () => {
+
+  delete window.CURRENT_USER.customMorphSpeed;
+  delete window.CURRENT_USER.customGlow;
+  delete window.CURRENT_USER.customMotionDamp;
+  delete window.CURRENT_USER.customBreatheSpeed;
+
+  applyVibe(window.ACTIVE_VIBE);
+
+  if (devMode) {
+    syncDevSliders();
+  }
+});
+
+
+//Vibe selector Dev- Control
+document.querySelectorAll(".devMoodBtn").forEach(btn => {
+
+  btn.addEventListener("click", async () => {
+
+    if (!window.CURRENT_USER || window.CURRENT_USER.role !== "developer") return;
+
+    const newVibe = btn.dataset.vibe;
+
+    // Apply immediately
+    window.ACTIVE_VIBE = newVibe;
+    applyVibe(newVibe);
+
+    // Persist to backend
+    try {
+      await fetch(`${window.BACKEND_URL}/api/update-vibe`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ vibe: newVibe })
+      });
+
+      console.log("Developer vibe updated:", newVibe);
+
+    } catch (err) {
+      console.error("Failed to update vibe:", err);
+    }
+
+  });
+
+});
+
+
+document.addEventListener('keydown', (e) => {
+  // Alt + `
+  if (e.altKey && e.code === 'Backquote') {
+
+  if (!window.CURRENT_USER || window.CURRENT_USER.role !== "developer") {
+    console.warn("Developer access required");
+    return;
+  }
+
+  devMode = !devMode;
+
+  const panel = document.getElementById('devPanel');
+  panel.style.display = devMode ? 'block' : 'none';
+
+  console.log('[DEV MODE]', devMode ? 'ENABLED' : 'DISABLED');
+}
+
+});
+
+
+// LOGOUT
+document.getElementById("logoutBtn").addEventListener("click", () => {
+
+  localStorage.removeItem("token");
+  window.CURRENT_USER = null;
+  experienceStarted = false;
+
+  document.getElementById("logoutBtn").style.display = "none";
+
+  // Reload clean state
+  location.reload();
+
+});
+
+// Auto restore session
+document.addEventListener("DOMContentLoaded", async () => {
+
+  const token = localStorage.getItem("token");
+
+if (!token) {
+  document.getElementById("createProfileModal").classList.remove("hidden");
+  return;
+}
+
+  const res = await fetch(`${window.BACKEND_URL}/api/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!res.ok) {
+    localStorage.removeItem("token");
+    document.getElementById("createProfileModal").classList.remove("hidden");
+    return;
+  }
+
+  const user = await res.json();
+
+  window.CURRENT_USER = user;
+
+document.getElementById("newProfileName").value = "";
+document.getElementById("newProfilePassword").value = "";
+
+modal.classList.add("hidden");
+
+window.ACTIVE_VIBE = user.vibe || selectedVibe || "calm";
+
+applyVibe(window.ACTIVE_VIBE);
+startMainExperience(null, true);
+handStatusEl.textContent = 'Tap here to enter fullscreen';
+});
+
+document.querySelector(".profile-modal-card")
+  .addEventListener("submit", e => e.preventDefault());
+
+</script>
+</body>
+</html>

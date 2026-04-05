@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Gesture Controlled Particle Universe</title>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<video class="input_video" style="display:none;"></video>
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const PARTICLE_COUNT = 1200;
+let particles = [];
+let currentShape = 0;
+let targetPositions = [];
+let handX = null;
+let handY = null;
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.tx = this.x;
+    this.ty = this.y;
+  }
+
+  update() {
+    // Smooth morph
+    this.x += (this.tx - this.x) * 0.08;
+    this.y += (this.ty - this.y) * 0.08;
+
+    // Hand interaction
+    if (handX !== null) {
+      const dx = this.x - handX;
+      const dy = this.y - handY;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+
+      if (dist < 120) {
+        const force = (120 - dist) / 120;
+        this.x += dx * force * 0.6;
+        this.y += dy * force * 0.6;
+      }
+    }
+  }
+
+  draw() {
+    ctx.fillStyle = "white";
+    ctx.fillRect(this.x, this.y, 2, 2);
+  }
+}
+
+for (let i = 0; i < PARTICLE_COUNT; i++) {
+  particles.push(new Particle());
+}
+
+function generateSphere() {
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  const radius = 200;
+
+  return particles.map(() => {
+    const theta = Math.random() * Math.PI * 2;
+    const r = radius * Math.sqrt(Math.random());
+    return {
+      x: centerX + r * Math.cos(theta),
+      y: centerY + r * Math.sin(theta)
+    };
+  });
+}
+
+function generateCube() {
+  const size = 300;
+  const startX = canvas.width/2 - size/2;
+  const startY = canvas.height/2 - size/2;
+
+  return particles.map(() => ({
+    x: startX + Math.random() * size,
+    y: startY + Math.random() * size
+  }));
+}
+
+function generateDNA() {
+  const centerX = canvas.width/2;
+  const centerY = canvas.height/2;
+
+  return particles.map((_, i) => {
+    const t = i * 0.1;
+    return {
+      x: centerX + Math.sin(t) * 150,
+      y: centerY + (i - PARTICLE_COUNT/2) * 0.4
+    };
+  });
+}
+
+function generateButterfly() {
+  const centerX = canvas.width/2;
+  const centerY = canvas.height/2;
+
+  return particles.map((_, i) => {
+    const t = i * 0.02;
+    const x = Math.sin(t) * (Math.exp(Math.cos(t)) - 2*Math.cos(4*t));
+    const y = Math.cos(t) * (Math.exp(Math.cos(t)) - 2*Math.cos(4*t));
+    return {
+      x: centerX + x * 40,
+      y: centerY + y * 40
+    };
+  });
+}
+
+function generateSpiral() {
+  const centerX = canvas.width/2;
+  const centerY = canvas.height/2;
+
+  return particles.map((_, i) => {
+    const angle = i * 0.1;
+    const radius = i * 0.15;
+    return {
+      x: centerX + radius * Math.cos(angle),
+      y: centerY + radius * Math.sin(angle)
+    };
+  });
+}
+
+function setShape(index) {
+  currentShape = index;
+
+  switch(index) {
+    case 0: targetPositions = generateSphere(); break;
+    case 1: targetPositions = generateCube(); break;
+    case 2: targetPositions = generateDNA(); break;
+    case 3: targetPositions = generateButterfly(); break;
+    case 4: targetPositions = generateSpiral(); break;
+  }
+
+  particles.forEach((p, i) => {
+    p.tx = targetPositions[i].x;
+    p.ty = targetPositions[i].y;
+  });
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+setShape(0);
+
+function countFingers(landmarks) {
+  let count = 0;
+
+  if (landmarks[8].y < landmarks[6].y) count++;
+  if (landmarks[12].y < landmarks[10].y) count++;
+  if (landmarks[16].y < landmarks[14].y) count++;
+  if (landmarks[20].y < landmarks[18].y) count++;
+  if (landmarks[4].x > landmarks[3].x) count++;
+
+  return count;
+}
+
+const videoElement = document.querySelector('.input_video');
+
+const hands = new Hands({
+  locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+});
+
+hands.setOptions({
+  maxNumHands: 1,
+  modelComplexity: 1,
+  minDetectionConfidence: 0.7,
+  minTrackingConfidence: 0.7
+});
+
+hands.onResults(results => {
+  if (results.multiHandLandmarks.length > 0) {
+    const landmarks = results.multiHandLandmarks[0];
+
+    handX = landmarks[8].x * canvas.width;
+    handY = landmarks[8].y * canvas.height;
+
+    const fingers = countFingers(landmarks);
+
+    if (fingers === 0) setShape(0);
+    if (fingers === 1) setShape(1);
+    if (fingers === 2) setShape(2);
+    if (fingers === 3) setShape(3);
+    if (fingers >= 4) setShape(4);
+  } else {
+    handX = null;
+    handY = null;
+  }
+});
+
+const camera = new Camera(videoElement, {
+  onFrame: async () => {
+    await hands.send({image: videoElement});
+  },
+  width: 640,
+  height: 480
+});
+camera.start();
+</script>
+
+</body>
+</html>
