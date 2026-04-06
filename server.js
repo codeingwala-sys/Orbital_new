@@ -190,7 +190,7 @@ app.post("/api/login", async (req, res) => {
   
   if (!supabase) {
     const user = mockDb.users.find(u => u.username === username);
-    if (!user) return res.status(404).json({ error: "User not found (Mock Mode)" });
+    if (!user) return res.status(401).json({ error: "User not found (Mock Mode)" });
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ error: "Invalid credentials (Mock Mode)" });
     
