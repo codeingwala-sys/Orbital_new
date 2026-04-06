@@ -233,7 +233,7 @@ app.post("/api/login", async (req, res) => {
 app.get("/api/me", authMiddleware, async (req, res) => {
   if (!supabase) {
     const user = mockDb.users.find(u => u.id === req.user.id);
-    if (!user) return res.status(404).json({ error: "User not found (Mock Mode)" });
+    if (!user) return res.status(401).json({ error: "User not found (Mock Mode or Session Expired)" });
     const { password, ...safeUser } = user;
     return res.json(safeUser);
   }
