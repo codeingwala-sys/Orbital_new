@@ -64,7 +64,9 @@ app.use((req, res, next) => {
 app.use(express.static(path.resolve()));
 
 // ── Groq ──
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = (process.env.GROQ_API_KEY && !process.env.GROQ_API_KEY.includes("your-")) 
+  ? new Groq({ apiKey: process.env.GROQ_API_KEY })
+  : null;
 
 // ─────────────────────────────────────────────────────────────
 //  DEVELOPER SEED
@@ -125,6 +127,8 @@ app.post("/api/register", async (req, res) => {
   if (!username || !password)
     return res.status(400).json({ error: "Username and password required" });
 
+  if (!supabase) return res.status(503).json({ error: "Service Unavailable", message: "Database connection not set. Please check Vercel Environment Variables." });
+
   const { data: existingUser } = await supabase
     .from("users")
     .select("username")
@@ -160,6 +164,8 @@ app.post("/api/register", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
   
+  if (!supabase) return res.status(503).json({ error: "Service Unavailable", message: "Database connection not set. Please check Vercel Environment Variables." });
+
   const { data: user, error } = await supabase
     .from("users")
     .select("*")
