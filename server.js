@@ -28,6 +28,14 @@ const supabase = (supabaseUrl && supabaseKey && !supabaseUrl.includes("your-proj
 const app  = express();
 const PORT = process.env.PORT || 3099;
 
+// ── MOCK DB (for testing without Supabase) ──
+const mockDb = {
+  users: [],
+  login_logs: [],
+  memories: {},
+  reminders: []
+};
+
 // ── File paths ──
 // ── CORS ──
 app.use(cors({
@@ -53,10 +61,7 @@ app.use((req, res, next) => {
 // ── CONNECTION GUARD ──
 app.use((req, res, next) => {
   if (!supabase && req.path.startsWith("/api/")) {
-    return res.status(503).json({ 
-      error: "Service Unavailable", 
-      message: "Database connection not established. Check SUPABASE_URL and SUPABASE_KEY in .env" 
-    });
+    console.warn(`[MOCK MODE] Handling ${req.path} without Supabase connection.`);
   }
   next();
 });
@@ -127,7 +132,26 @@ app.post("/api/register", async (req, res) => {
   if (!username || !password)
     return res.status(400).json({ error: "Username and password required" });
 
-  if (!supabase) return res.status(503).json({ error: "Service Unavailable", message: "Database connection not set. Please check Vercel Environment Variables." });
+  if (!supabase) {
+    const exists = mockDb.users.some(u => u.username.toLowerCase() === username.toLowerCase());
+    if (exists) return res.status(409).json({ error: "User exists (Mock Mode)" });
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = {
+      id: "mock-" + Date.now(),
+      username: username.trim(),
+      password: hashedPassword,
+      role: "user",
+      gender: gender || "neutral",
+      vibe: vibe || "calm",
+      persona: "default",
+      avatar_seed: `${username}-${gender || "neutral"}`,
+      created_at: new Date().toISOString(),
+      last_active: new Date().toISOString()
+    };
+    mockDb.users.push(newUser);
+    return res.json({ message: "Registered successfully (Mock Mode)" });
+  }
 
   const { data: existingUser } = await supabase
     .from("users")
@@ -164,7 +188,18 @@ app.post("/api/register", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
   
-  if (!supabase) return res.status(503).json({ error: "Service Unavailable", message: "Database connection not set. Please check Vercel Environment Variables." });
+  if (!supabase) {
+    const user = mockDb.users.find(u => u.username === username);
+    if (!user) return res.status(404).json({ error: "User not found (Mock Mode)" });
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(401).json({ error: "Invalid credentials (Mock Mode)" });
+    
+    const token = jwt.sign(
+      { id: user.id, role: user.role, username: user.username, vibe: user.vibe },
+      JWT_SECRET, { expiresIn: "7d" }
+    );
+    return res.json({ token, role: user.role, message: "Logged in via Mock Mode" });
+  }
 
   const { data: user, error } = await supabase
     .from("users")
@@ -196,6 +231,12 @@ app.post("/api/login", async (req, res) => {
 
 // ── Me ──
 app.get("/api/me", authMiddleware, async (req, res) => {
+  if (!supabase) {
+    const user = mockDb.users.find(u => u.id === req.user.id);
+    if (!user) return res.status(404).json({ error: "User not found (Mock Mode)" });
+    const { password, ...safeUser } = user;
+    return res.json(safeUser);
+  }
   const { data: user, error } = await supabase
     .from("users")
     .select("*")
@@ -210,6 +251,11 @@ app.get("/api/me", authMiddleware, async (req, res) => {
 // ── Update Vibe ──
 app.post("/api/update-vibe", authMiddleware, async (req, res) => {
   const { vibe } = req.body;
+  if (!supabase) {
+    const user = mockDb.users.find(u => u.id === req.user.id);
+    if (user) user.vibe = vibe;
+    return res.json({ ok: true });
+  }
   const { error } = await supabase
     .from("users")
     .update({ vibe })
