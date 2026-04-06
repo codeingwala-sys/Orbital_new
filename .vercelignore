@@ -1,0 +1,17 @@
+venv/
+node_modules/
+.vscode/
+Install-dlib-main/
+python_requirements.txt
+*.whl
+oribital_backend/
+server_log.txt
+server_error.txt
+server_pid.txt
+test_port.js
+start_server.ps1
+.env
+loginLogs.json
+users.json
+reminders.json
+memory.json
